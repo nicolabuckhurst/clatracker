@@ -1,0 +1,26 @@
+{
+  "name": "clatracker",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "export NODE_ENV=dev && nodemon ./bin/www",
+    "test": "export NODE_ENV=test && mocha"
+  },
+  "dependencies": {
+    "bluebird": "^3.5.1",
+    "body-parser": "~1.18.2",
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.6.9",
+    "ejs": "~2.5.7",
+    "express": "~4.15.5",
+    "morgan": "~1.9.0",
+    "redis": "^2.8.0",
+    "serve-favicon": "~2.4.5"
+  },
+  "devDependencies": {
+    "chai-as-promised-compat": "^7.0.3",
+    "chai-http": "^4.0.0",
+    "chai": "^4.1.2",
+    "mocha": "^5.2.0"
+  }
+}
