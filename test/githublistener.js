@@ -18,17 +18,17 @@ chai.use(chaiHttp);
 describe("/githublistener POST",function(){
 
   describe("received a valid github payload", function(){
-    it("should respond with a 200", function(){
-      return chai.request(app).post('/githublistener')
-      .type("application/json")
-      .send(dummydata)
-      .then(function(res){
-        expect(res.status).to.equal(200);
-      })
-      .catch(function(err){
-          throw err;
-      })
-    })
+    it("should respond with a 200")//, function(){
+      //return chai.request(app).post('/githublistener')
+      //.type("application/json")
+      //.send(dummydata)
+      //.then(function(res){
+        //expect(res.status).to.equal(200);
+      //})
+      //.catch(function(err){
+        //  throw err;
+      //})
+    //})
   })
 
   //write test for invalid github payload
