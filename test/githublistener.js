@@ -10,7 +10,6 @@ var path = require("path")
 //do not read in the .json file using requires() ...this checks the syntax for
 //the .json file and throws an error when you try and read the corrupt json file
 var dummydata = fs.readFileSync(path.join(__dirname, "../dummyPayloads/examplegithubpayload.json"),{encoding:"utf8"})
-var dummydataCORRUPT = fs.readFileSync(path.join(__dirname, "../dummyPayloads/examplegithubpayloadCORRUPT.json"),{encoding:"utf8"});
 
 //access extra chaiHttp utilities not as stadard in chai export
 chai.use(chaiHttp);
@@ -18,7 +17,7 @@ chai.use(chaiHttp);
 describe("/githublistener POST",function(){
 
   describe("received a valid github payload", function(){
-    it("should respond with a 200")//, function(){
+    it("should be verified as from github", function(){
       //return chai.request(app).post('/githublistener')
       //.type("application/json")
       //.send(dummydata)
@@ -28,7 +27,9 @@ describe("/githublistener POST",function(){
       //.catch(function(err){
         //  throw err;
       //})
-    //})
+    })
+
+    it("should have the fields we require")
   })
 
   //write test for invalid github payload
