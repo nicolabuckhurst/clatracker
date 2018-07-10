@@ -11,8 +11,6 @@ var DatabaseStore = {
 
   //add a method that creates a client for interacting with correct databse
   connectToDatabase: function(){
-    console.log("this is the "+process.env.NODE_ENV+"environment");
-    console.log("connected to database at "+process.env.REDIS_URL)
     return redis.createClient(process.env.REDIS_URL)
   },
 
@@ -41,9 +39,96 @@ var DatabaseStore = {
           client.quit()                   //close connection to database
           return(userDetailsFromDatabase) //return the object that is returned from database
         })
+    },
 
+    //check if user exists
+    checkUserAsync: function(githubId){
+      let client=this.connectToDatabase(); //connect to database
+      let key = "user:"+githubId; //create a key for accessing user details
 
+      return client.existsAsync(key) //return a promise to find key in database
+        .then(function(redisResponse){
+          client.quit()     //close connectoin to datatbase
+          if(redisResponse == 1){ //convert 1, 0 redis response to true or false
+            return(true);
+          } else {
+            return(false)
+          }
+        })
+    },
+
+    //add a CLA Version to user
+    addCLAVersion: function(githubId, version, CLAUserDetails){
+      let client=this.connectToDatabase(); //connect to database
+
+      let CLAListKey = "CLAList:"+githubId;
+      let CLADetailsKey="CLA:"+version+":"+githubId;
+
+      let promises =[];
+
+      promises.push(client.saddAsync(CLAListKey, version));  //if key doesn't exist in database it will be created
+      promises.push(client.hmsetAsync(CLADetailsKey, CLAUserDetails));
+
+      return Promise.all(promises)
+        .then(function(redisResponses){ //the redis response for saddAsync is the number of members stored
+                                       //(member isn't stored if it already exists)
+                                       //for the hmsetAsync response should be "OK"
+          console.log(redisResponses);
+          client.quit() //close connection to data
+          return(redisResponses)
+        })
+    },
+
+    //retrieve list of users CLA versions
+    getCLAVersions: function(githubId){
+        let client=this.connectToDatabase(); //connect to database
+        let key = "CLAList:"+githubId;
+
+        return client.smembersAsync(key) //returns an array of CLA Versions
+          .then(function(CLAList){
+            client.quit() //close connection to database
+            return(CLAList)
+          })
+    },
+
+    //get CLA version details
+    getCLADetails: function(githubId, version){
+      let client = this.connectToDatabase(); //connect to database
+      let key = "CLA:"+version+":"+githubId;
+
+      return client.hgetallAsync(key)
+        .then(function(CLADetails){
+          client.quit() //close connection to database
+          return(CLADetails)
+        })
+    },
+
+    //check if a CLA has been signed by user
+    checkCLA: function(githubId, version){
+      let client=this.connectToDatabase(); //connect to database
+      let key = "CLAList:"+githubId;
+
+      return client.sismemberAsync(key, version)
+        .then(function(redisResponse){
+          client.quit(); //close connection to database
+          if(redisResponse == 1){
+            return true;
+          } else {
+            return false;
+          }
+        })
+    },
+
+    //reset database
+    resetDatabaseAsync: function(){
+      let client=this.connectToDatabase(); //connect to database
+      return client.flushallAsync()
+        .then(function(redisResponse){
+          client.quit();
+          return(redisResponse)
+        })
     }
+
 
 }
 
