@@ -107,11 +107,9 @@ var DatabaseStore = {
     checkCLAAsync: function(githubId, version){
       let client=this.connectToDatabase(); //connect to database
       let key = "CLAList:"+githubId;
-      console.log("in checkCLA()")
 
       return client.sismemberAsync(key, version) //returns a 1 if true and 0 if false
         .then(function(redisResponse){
-          console.log("checkCLA response"+redisResponse)
           client.quit(); //close connection to database
           if(redisResponse == 1){
             return true;

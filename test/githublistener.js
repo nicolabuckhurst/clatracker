@@ -20,20 +20,11 @@ chai.use(chai_sinon);
 
 describe("/githublistener POST",function(){
 
-  describe("received a valid payload from github", function(){
+  afterEach("flush the database", function(){
+    return databaseStore.resetDatabaseAsync()
+  })
 
-    it("should respond with a 200 if all checks pass", function(){
-      return chai.request(app).post('/githublistener')
-      .type("application/json")
-      .set('X-Hub-Signature',"abc")
-      .send(testpayloadContributor)
-      .then(function(res){
-        expect(res.status).to.equal(200);
-      })
-      .catch(function(err){
-          throw err;
-      })
-    })
+  describe("received an invalid payload from github", function(){
 
     it("should respond with a 500 if X-hub-signature header isnt present ", function(){
       return chai.request(app).post('/githublistener')
@@ -75,44 +66,141 @@ describe("/githublistener POST",function(){
   })
 
 
-  describe("pull request opened by org member", function(){
-    before("set a spy on database.checkCLA()", function(){
-      sinon.spy(databaseStore, "checkCLAAsync")
-    })
+  describe("received a valid payload from github", function(){
 
-    after("database flush and remove spy", function(){
-      return databaseStore.resetDatabaseAsync()
-        .then(function(){
-          databaseStore.checkCLAAsync.restore();
+    describe("pull request opened by org member", function(){
+      before("set a spy on database.checkCLA()", function(){
+        sinon.spy(databaseStore, "checkCLAAsync")
+      })
+
+      after("remove spy", function(){
+        databaseStore.checkCLAAsync.restore();
+      })
+
+      it("it should respond with a 200 and not call database", function(){
+        return chai.request(app).post('/githublistener')
+        .type("application/json")
+        .set('X-Hub-Signature', "")
+        .send(testpayloadMember)
+        .then(function(res){
+          expect(res.status).to.equal(200);
+          expect(databaseStore.checkCLAAsync).to.not.have.been.called;
         })
+        .catch(function(err){
+            throw err;
+        })
+      })
     })
 
-    it("it should respond with a 200 and not call database", function(){
-      return chai.request(app).post('/githublistener')
-      .type("application/json")
-      .set('X-Hub-Signature', "")
-      .send(testpayloadMember)
-      .then(function(res){
-        expect(res.status).to.equal(200);
-        expect(databaseStore.checkCLAAsync).to.not.have.been.called;
+    describe("pull request opened by non member", function(){
+
+      describe("if contributor has signed relevant CLA", function(){
+        before("set spies and add dummy data to database to database", function(){
+          let promises = []
+          promises.push(databaseStore.setCLARequirementsAsync("cla-tracker/dummydata", "version 1"))
+          promises.push(databaseStore.storeContributorDetailsAsync("123456",{"login":"testUser"}))
+          promises.push(databaseStore.addCLAVersionAsync("123456","version 1",{"email":"testemail"}))
+          return Promise.all(promises)
+            .then(function(){
+                sinon.spy(databaseStore, "checkCLAAsync")
+                sinon.spy(databaseStore, "checkCLARequirementsAsync")
+            })
+          })
+
+        after("remove spies", function(){
+          databaseStore.checkCLARequirementsAsync.restore()
+          databaseStore.checkCLAAsync.restore()
+        })
+
+        it("it should call checkCLARequirementsAsync, checkCLAAsync, send a status to github and respond with status 201 if user has signed CLA", function(){
+          return chai.request(app).post('/githublistener')
+          .type("application/json")
+          .set('X-Hub-Signature', "")
+          .send(testpayloadContributor)
+          .then(function(res){
+            expect(res.status).to.equal(201);
+            expect(databaseStore.checkCLARequirementsAsync).to.have.been.called;
+            expect(databaseStore.checkCLAAsync).to.have.been.called;
+            expect(/*put in status test*/)
+          })
+          .catch(function(err){
+            throw err;
+          })
+        })
       })
-      .catch(function(err){
-          throw err;
+
+      describe("if contributor has NOT signed relevant CLA", function(){
+        before("set spies and add dummy data to database to database", function(){
+          let promises = []
+          promises.push(databaseStore.setCLARequirementsAsync("cla-tracker/dummydata", "version 1"))
+          promises.push(databaseStore.storeContributorDetailsAsync("123456",{"login":"testUser"}))
+          promises.push(databaseStore.addCLAVersionAsync("123456","version 2",{"email":"testemail"}))
+          return Promise.all(promises)
+            .then(function(){
+              sinon.spy(databaseStore, "checkCLAAsync")
+              sinon.spy(databaseStore, "checkCLARequirementsAsync")
+            })
+          })
+
+        after("remove spies", function(){
+          databaseStore.checkCLARequirementsAsync.restore()
+          databaseStore.checkCLAAsync.restore()
+        })
+
+        it("it should call checkCLARequirementsAsync, checkCLAAsync, send a status to github and respond with status 202 if user has NOT signed CLA", function(){
+          return chai.request(app).post('/githublistener')
+          .type("application/json")
+          .set('X-Hub-Signature', "")
+          .send(testpayloadContributor)
+          .then(function(res){
+            expect(res.status).to.equal(202);
+            expect(databaseStore.checkCLARequirementsAsync).to.have.been.called;
+            expect(databaseStore.checkCLAAsync).to.have.been.called;
+            expect()
+            expect(/*put in status test*/)
+          })
+          .catch(function(err){
+            throw err;
+          })
+        })
       })
+
+      describe("if CLA not required", function(){
+        before("set spies and add dummy data to database to database", function(){
+          let promises = []
+          promises.push(databaseStore.storeContributorDetailsAsync("123456",{"login":"testUser"}))
+          promises.push(databaseStore.addCLAVersionAsync("123456","version 1",{"email":"testemail"}))
+          return Promise.all(promises)
+            .then(function(){
+              sinon.spy(databaseStore, "checkCLAAsync")
+              sinon.spy(databaseStore, "checkCLARequirementsAsync")
+            })
+          })
+
+        after("remove spies", function(){
+          databaseStore.checkCLARequirementsAsync.restore()
+          databaseStore.checkCLAAsync.restore()
+        })
+
+        it("it should call checkCLARequirementsAsync, checkCLAAsync, send a status to github and respond with status 203 CLA not required", function(){
+          return chai.request(app).post('/githublistener')
+          .type("application/json")
+          .set('X-Hub-Signature', "")
+          .send(testpayloadContributor)
+          .then(function(res){
+            expect(res.status).to.equal(203);
+            expect(databaseStore.checkCLARequirementsAsync).to.have.been.called;
+            expect()
+            expect(/*put in status test*/)
+          })
+          .catch(function(err){
+            throw err;
+          })
+        })
+      })
+
     })
+
   })
 
-  describe("pull request opened by non member", function(){
-    it("should check for contributer in database")
-
-    describe("member already signed a cla",function(){
-      it("should respond with 200 and send a status update to github that CLA is signed", function(){
-
-      })
-    })
-
-    describe("member not signed a cla",function(){
-      it("should send a 200 and send a status update to github with link to CLA")
-    })
-  })
 })

@@ -5,7 +5,6 @@ var verifySignature= require('../helpers/verifySignature');
 
 var databaseStore=require('../models/DatabaseStore');
 
-
 router.post('/', function(req,res,next){
 
     //don't allow webhook connections without a secret
@@ -48,9 +47,49 @@ router.post('/', function(req,res,next){
       res.sendStatus(200); //if author is a member of organisation that owns repository do nothing
       return
     } else {
-      //check whether CLA has been signed
-      res.sendStatus(200);
+      processNonMemberPullRequestAsync(req,res)
+        .then(function(){
+          return
+        })
     }
 })
+
+
+var processNonMemberPullRequestAsync = function(req, res){
+  var repoName = req.body["repository"]["full_name"]
+  var githubId = req.body["pull_request"]["user"]["id"]
+  var userDetails = {"login":req.body["pull_request"]["user"]["login"]}
+  var CLAStatus
+
+  return databaseStore.checkCLARequirementsAsync(repoName)
+    .then(function(version){
+      console.log("required cla"+version)
+      if(version != null){
+        return databaseStore.checkCLAAsync(githubId, version)
+      } else {
+        return "not required"
+      }
+    })
+    .then(function(signed){
+      if(signed==true){
+        console.log("user has signed CLA")
+        res.status(201).send("user has already signed relevant CLA")
+        CLAStatus = "signed"
+        //TODO Write code to send ststus to github that user has signed CLA
+
+      } else {
+        if(signed==false){
+          console.log("user has not signed CLA")
+          res.status(202).send("user had not yet signed relevant CLA")
+          CLAStatus = "not signed"
+          //TODO write code to send status to github that user has NOT signed required CLA
+        } else {
+          console.log("user has not signed CLA")
+          res.status(203).send("CLA not required")
+          CLAStatus = "not required"
+        }
+      }
+    })
+}
 
 module.exports = router;
