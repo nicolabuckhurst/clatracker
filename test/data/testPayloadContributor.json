@@ -1,0 +1,12 @@
+{
+  "pull_request":{
+    "user":{
+      "login":"testUser",
+      "id":123456
+    },
+    "author_association":"CONTRIBUTOR"
+  },
+  "repository":{
+    "full_name":"cla-tracker/dummydata"
+  }
+}

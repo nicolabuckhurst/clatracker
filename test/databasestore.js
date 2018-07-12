@@ -66,28 +66,56 @@ describe("Database Interactions", function(){
 
     it("adds a new version number to a set of CLAs associated with githubId", function(){
       let promises =[];
-      promises.push(databaseStore.addCLAVersion(testGithubId, testCLA1, testCLADetails));
-      promises.push(databaseStore.addCLAVersion(testGithubId, testCLA2, testCLADetails));
+      promises.push(databaseStore.addCLAVersionAsync(testGithubId, testCLA1, testCLADetails));
+      promises.push(databaseStore.addCLAVersionAsync(testGithubId, testCLA2, testCLADetails));
       return Promise.all(promises)
         .then(function(redisResponses){ //you get an array here as each promise in promises resolves to a result
           expect(redisResponses).to.eql([[1,"OK"],[1,"OK"]]); //use .eql not equal when comparing arrays
-          return databaseStore.getCLAVersions(testGithubId);
+          return databaseStore.getCLAVersionsAsync(testGithubId);
         })
         .then(function(ArrayOfCLAVersions){
           expect(ArrayOfCLAVersions).to.eql([testCLA1, testCLA2]);
-          return databaseStore.checkCLA(testGithubId, "version 2")
+          return databaseStore.checkCLAAsync(testGithubId, "version 2")
         })
         .then(function(signed){
           expect(signed).to.equal(true);
-          return databaseStore.checkCLA(testGithubId, "version 3");
+          return databaseStore.checkCLAAsync(testGithubId, "version 3");
         })
         .then(function(signed){
           expect(signed).to.be.equal(false);
-          return databaseStore.getCLADetails(testGithubId, testCLA1)
+          return databaseStore.getCLADetailsAsync(testGithubId, testCLA1)
         })
         .then(function(CLADetails){
           expect(CLADetails).to.eql(testCLADetails);
         })
+    })
+  })
+
+  describe("Set the CLA version requirement for a repository", function(){
+
+    it("adds a new key:value pair to the CLARequirements key in database", function(){
+      return databaseStore.setCLARequirementsAsync("cla-tracker/dummydata", "version 1")
+        .then(function(redisResponse){
+          expect(redisResponse).to.equal(1)
+          return databaseStore.checkCLARequirementsAsync("cla-tracker/dummydata")
+        })
+        .then(function(version){
+          expect(version).to.equal("version 1")
+        })
+    })
+  })
+
+  describe("return a list of CLA requirements for repositories", function(){
+
+    before("add a new key:value pair to CLAReequirements key in database", function(){
+      return databaseStore.setCLARequirementsAsync("cla-tracker/dummydata", "version 1")
+    })
+
+    it("returns a list of CLA requirements", function(){
+      return databaseStore.getCLARequirementListAsync()
+        .then(function(list){
+          expect(list).to.eql({"cla-tracker/dummydata":"version 1"})
+      })
     })
   })
 

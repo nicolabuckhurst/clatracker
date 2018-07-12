@@ -58,7 +58,7 @@ var DatabaseStore = {
     },
 
     //add a CLA Version to user
-    addCLAVersion: function(githubId, version, CLAUserDetails){
+    addCLAVersionAsync: function(githubId, version, CLAUserDetails){
       let client=this.connectToDatabase(); //connect to database
 
       let CLAListKey = "CLAList:"+githubId;
@@ -80,7 +80,7 @@ var DatabaseStore = {
     },
 
     //retrieve list of users CLA versions
-    getCLAVersions: function(githubId){
+    getCLAVersionsAsync: function(githubId){
         let client=this.connectToDatabase(); //connect to database
         let key = "CLAList:"+githubId;
 
@@ -92,7 +92,7 @@ var DatabaseStore = {
     },
 
     //get CLA version details
-    getCLADetails: function(githubId, version){
+    getCLADetailsAsync: function(githubId, version){
       let client = this.connectToDatabase(); //connect to database
       let key = "CLA:"+version+":"+githubId;
 
@@ -104,12 +104,14 @@ var DatabaseStore = {
     },
 
     //check if a CLA has been signed by user
-    checkCLA: function(githubId, version){
+    checkCLAAsync: function(githubId, version){
       let client=this.connectToDatabase(); //connect to database
       let key = "CLAList:"+githubId;
+      console.log("in checkCLA()")
 
-      return client.sismemberAsync(key, version)
+      return client.sismemberAsync(key, version) //returns a 1 if true and 0 if false
         .then(function(redisResponse){
+          console.log("checkCLA response"+redisResponse)
           client.quit(); //close connection to database
           if(redisResponse == 1){
             return true;
@@ -127,8 +129,38 @@ var DatabaseStore = {
           client.quit();
           return(redisResponse)
         })
-    }
+    },
 
+    //set the CLA Version required for a repository
+    setCLARequirementsAsync: function(repositoryFullName, version){
+      let client=this.connectToDatabase(); //connect to database
+      return client.hsetAsync("CLARequirements", repositoryFullName, version)
+        .then(function(redisResponse){
+          client.quit() //close connection to database
+          return redisResponse
+        })
+    },
+
+    //check which CLA version is required for a repository
+    checkCLARequirementsAsync: function(repositoryFullName){
+      let client=this.connectToDatabase(); //connect to database
+        return client.hgetAsync("CLARequirements", repositoryFullName)
+          .then(function(CLAVersion){
+            client.quit() //close connection to database
+            console.log(CLAVersion)
+            return CLAVersion
+          })
+    },
+
+    //get a list of CLAReequirements
+    getCLARequirementListAsync: function(){
+      let client=this.connectToDatabase(); //connect to database
+        return client.hgetallAsync("CLARequirements") //returns an object with of the key:name pairs
+          .then(function(list){
+            client.quit();
+            return(list)
+          })
+    }
 
 }
 
