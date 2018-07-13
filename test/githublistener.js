@@ -69,6 +69,7 @@ describe("/githublistener POST",function(){
   describe("received a valid payload from github", function(){
 
     describe("pull request opened by org member", function(){
+
       before("set a spy on database.checkCLA()", function(){
         sinon.spy(databaseStore, "checkCLAAsync")
       })
@@ -95,6 +96,7 @@ describe("/githublistener POST",function(){
     describe("pull request opened by non member", function(){
 
       describe("if contributor has signed relevant CLA", function(){
+
         before("set spies and add dummy data to database to database", function(){
           let promises = []
           promises.push(databaseStore.setCLARequirementsAsync("cla-tracker/dummydata", "version 1"))
@@ -130,6 +132,7 @@ describe("/githublistener POST",function(){
       })
 
       describe("if contributor has NOT signed relevant CLA", function(){
+
         before("set spies and add dummy data to database to database", function(){
           let promises = []
           promises.push(databaseStore.setCLARequirementsAsync("cla-tracker/dummydata", "version 1"))
@@ -166,6 +169,7 @@ describe("/githublistener POST",function(){
       })
 
       describe("if CLA not required", function(){
+
         before("set spies and add dummy data to database to database", function(){
           let promises = []
           promises.push(databaseStore.storeContributorDetailsAsync("123456",{"login":"testUser"}))
