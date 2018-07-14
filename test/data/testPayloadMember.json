@@ -4,6 +4,9 @@
       "login":"testUser",
       "id":123456
     },
+    "head":{
+      "sha":"6e08351a0afb9daad5686cdac4b913b2e19a6bb1"
+    },
     "author_association":"MEMBER"
   },
   "repository":{
