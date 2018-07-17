@@ -13,6 +13,9 @@ var verifySignature = function(payloadBody, xHubSignature){
   //add sha1= to front of hash as per github docs
   var signature = "sha1="+hash;
 
+  console.log(xHubSignature)
+  console.log(signature)
+
   //use a timing safe equal function rather than == as its more secure as all
   //comparisons will take same time...the function in crypto can only compare
   //Buffers so convert the 2 strings to compare to buffers

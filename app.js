@@ -9,7 +9,6 @@ var index = require('./routes/index');
 var users = require('./routes/users');
 var githublistener = require('./routes/githublistener');
 var status = require('./routes/status');
-var testGithubStatus = require('./routes/testGithubStatus');
 
 var app = express();
 
@@ -29,7 +28,6 @@ app.use('/', index);
 app.use('/users', users);
 app.use('/githublistener', githublistener);
 app.use('/status', status);
-app.use('/testGithubStatus', testGithubStatus)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

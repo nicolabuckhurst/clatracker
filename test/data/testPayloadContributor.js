@@ -1,3 +1,4 @@
+var testPayloadContributor =
 {
   "pull_request":{
     "user":{
@@ -5,11 +6,13 @@
       "id":123456
     },
     "head":{
-      "sha":"6e08351a0afb9daad5686cdac4b913b2e19a6bb1"
+      "sha":process.env.GITHUB_PULL_REQ_SHA
     },
     "author_association":"CONTRIBUTOR"
   },
   "repository":{
-    "full_name":"cla-tracker/dummydata"
+    "full_name":process.env.GITHUB_TEST_REPO_FULL_NAME
   }
 }
+
+module.exports=testPayloadContributor

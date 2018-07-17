@@ -4,8 +4,8 @@ var chai = require("chai");
 
 var expect = require("chai").expect;
 
-var verificationTestPayload = require('./data/verificationTestPayload')
-var verificationTestXHubSignature = require('./data/verificationTestXHubSignature')
+var verificationTestPayload = require('./data/verifySignatureTestPayload')
+var verificationTestXHubSignature = process.env.VERIFICATION_TEST_XHUBSIGNATURE
 
 var verifySignature = require('../helpers/verifySignature');
 

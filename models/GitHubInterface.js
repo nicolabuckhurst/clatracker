@@ -13,34 +13,37 @@ var GitHubInterface = {
     //Header Accept set as specified in github docs
     //Header Content-Type set as in github docs
     //body contains parameters of new status as stringified JSON as per Fetch Documentation
-    fetch("https://api.github.com/repos/"+payloadDataObject["repoName"]+"statuses/"+payloadDataObject["pullRequestSha"],
+    console.log("https://api.github.com/repos/"+payloadDataObject["repoName"]+"/statuses/"+payloadDataObject["pullRequestSha"])
+    return fetch("https://api.github.com/repos/"+payloadDataObject["repoName"]+"/statuses/"+payloadDataObject["pullRequestSha"],
           {
             method:"post",
             headers:{"Accept":"application/vnd.github.howard-the-duck-preview+json",
                       "Content-Type":"application/json",
                       "Authorization": "token "+process.env.GITHUB_PERSONAL_ACCESS_TOKEN},
-            body:JSON.stringify({"state":"pending","description":"test3"})
+            body:JSON.stringify(githubStatusObject)
           }
         )
     .then(function(githubresponse){
-
       console.log(githubresponse.headers)
       //fetch returns a promise that resolves to a response object which is a stream
       //response objects have a .json() method to parse body of response stream to json..this returns a promise
       //to resolve to json
       return githubresponse.json()
       })
-
     .then(
-      function(githubresponse){
-        console.log("body of response"+JSON.stringify(githubresponse))
+      function(githubJson){
+        //log body of response and return "status set message"
+        console.log("body of response"+JSON.stringify(githubJson))
         return "status set"
       },
       function(error){
+        //in case of error log error and return message "status could not be set"
         console.log(error)
         return "status could not be set"
       }
     )
+  }
+
 }
 
 module.exports = GitHubInterface

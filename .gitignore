@@ -33,4 +33,4 @@ npm-debug.log
 .DS_Store
 
 #dummy payload from github
-dummyPayloads
+examplePayloads

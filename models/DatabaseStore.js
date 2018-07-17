@@ -108,8 +108,12 @@ var DatabaseStore = {
       let client=this.connectToDatabase(); //connect to database
       let key = "CLAList:"+githubId;
 
+      console.log("key"+key);
+      console.log("look up version"+version)
+
       return client.sismemberAsync(key, version) //returns a 1 if true and 0 if false
         .then(function(redisResponse){
+          console.log("sismember result"+redisResponse)
           client.quit(); //close connection to database
           if(redisResponse == 1){
             return true;
@@ -141,6 +145,7 @@ var DatabaseStore = {
 
     //check which CLA version is required for a repository
     checkCLARequirementsAsync: function(repositoryFullName){
+      console.log(repositoryFullName)
       let client=this.connectToDatabase(); //connect to database
         return client.hgetAsync("CLARequirements", repositoryFullName)
           .then(function(CLAVersion){

@@ -11,8 +11,11 @@ var databaseStore = require("../models/DatabaseStore");
 //do not read in the .json file using requires() ...this checks the syntax for
 //the .json file and throws an error when you try and read the corrupt json file
 var testpayloadContributor = require('./data/testPayloadContributor')
-var testpayloadCORRUPT = require('./data/testPayloadCORRUPT')
+console.log("testpayloadContributor"+JSON.stringify(testpayloadContributor))
+var testpayloadCORRUPT = {}
 var testpayloadMember = require('./data/testPayloadMember')
+
+var Promise= require("bluebird")
 
 //access extra chaiHttp utilities not as stadard in chai export
 chai.use(chaiHttp);
