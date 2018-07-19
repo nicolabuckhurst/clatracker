@@ -163,7 +163,7 @@ var DatabaseStore = {
             client.quit();
             return(list)
           })
-    }
+    },
 
 }
 

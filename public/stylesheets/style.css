@@ -1,8 +1,31 @@
-body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+
+body{
+  background-color: ghostwhite;
 }
 
-a {
-  color: #00B7FF;
+.transparentBox{
+  background-color: rgba(255,255,255,0);
+  min-height: 100vh;
+}
+
+.navbarCustom {
+  background-color: lightgrey;
+  margin-bottom: 15px;
+}
+
+/*set a background colour to footer*/
+#myfooter .row{
+  background-color: lightgrey;
+}
+
+.fa-copyright{
+  color: indigo ;
+}
+
+#logo{
+  color: indigo;
+}
+
+.h1{
+  color:indigo;
 }
