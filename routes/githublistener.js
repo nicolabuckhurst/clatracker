@@ -146,6 +146,7 @@ var checkDataInPayload = function(req){
       return {"status":"passed","data":payloadData};
     }
   }
+}
 
   //returns a success or fail object
   //{"status":"passed"}
@@ -160,9 +161,6 @@ var checkDataInPayload = function(req){
       return {"status":"passed"}
     }
   }
-
-
-}
 
 
 module.exports = router;

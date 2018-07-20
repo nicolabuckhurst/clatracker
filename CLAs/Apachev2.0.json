@@ -1,0 +1,13 @@
+{
+  "text":"",
+  "optionalfields": {
+    "organisation_name":"text",
+    "title":""
+  },
+  "requiredfields":{
+    "full name":"text",
+    "date":"date",
+    "email":"email",
+    "address":"text"
+  }
+}

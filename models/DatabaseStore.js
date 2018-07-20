@@ -34,10 +34,19 @@ var DatabaseStore = {
       let client=this.connectToDatabase(); //connect to database
       let key = "user:"+githubId;          //create a key for accessing user details
 
-      return client.hgetallAsync(key)      //return a promise to get user details from Redis
+      return client.existsAsync(key)
+        .then(function(exists){
+          if(exists==1){
+            return client.hgetallAsync(key)
+          } else {
+            return null
+          }
+        })
+        //return a promise to get user details from Redis
         .then(function(userDetailsFromDatabase){
           client.quit()                   //close connection to database
           return(userDetailsFromDatabase) //return the object that is returned from database
+                                          //or null is user not found
         })
     },
 

@@ -10,6 +10,9 @@ var config = require("../config.js");
 var app = require('../app');
 var debug = require('debug')('clatracker:server');
 var http = require('http');
+var https = require('https')
+
+var fs = require('fs');
 
 /**
  * Get port from environment and store in Express.
@@ -25,8 +28,13 @@ var bind = normalizePort(process.env.BIND || '127.0.0.1');
  * Create HTTP server.
  */
 
-var server = http.createServer(app);
+//var server = http.createServer(app);
+var options={
+  key: fs.readFileSync(process.env.SSL_KEY),
+  cert: fs.readFileSync(process.env.SSL_CERT)
+}
 
+var server = https.createServer(options,app);
 /**
  * Listen on provided port, on all network interfaces.
  */
