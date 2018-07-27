@@ -6,16 +6,18 @@ var expressSession = require('express-session')
 var databaseStore = require("../models/DatabaseStore")
 
 router.get("/", function(req, res, next){
-  let loggedIn
+  let loggedIn, profilepicture
 
   if (req.user != null){
     loggedIn = true;
+    profilePicture = req.user["githubPicture"]
   } else {
     loggedIn = false;
-    expressSession.redirect = '/CLA'
+    profilePicture = "#"
   }
 
-  res.render('signup', {"title":"Sign CLA", "loggedIn":loggedIn})
+
+  res.render('CLA', {"title":"Sign CLA", "loggedIn":loggedIn, "profilePicture":profilePicture})
 })
 
 module.exports=router
