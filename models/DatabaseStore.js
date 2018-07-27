@@ -7,6 +7,14 @@ var bluebird = require('bluebird');
 /*promisify the redis client object methods...adds Async to end of method name*/
 bluebird.promisifyAll(redis);
 
+//DATABASE store
+//user github profile details are stored by key user:githubId
+//list of clas signed by a user are stored in a Set by key CLAList:githubId
+//CLARequirements are stored against a key CLARequirements as a hash repositoryname:cla version
+//User details for a particular CLA  CLA:claversion:githubId (these could be different to github profile info)
+//CLA contents is stored as hash against key CLA:claversion
+
+
 var DatabaseStore = {
 
   //add a method that creates a client for interacting with correct databse
@@ -100,18 +108,6 @@ var DatabaseStore = {
           })
     },
 
-    //get CLA version details
-    getCLADetailsAsync: function(githubId, version){
-      let client = this.connectToDatabase(); //connect to database
-      let key = "CLA:"+version+":"+githubId;
-
-      return client.hgetallAsync(key)
-        .then(function(CLADetails){
-          client.quit() //close connection to database
-          return(CLADetails)
-        })
-    },
-
     //check if a CLA has been signed by user
     checkCLAAsync: function(githubId, version){
       let client=this.connectToDatabase(); //connect to database
@@ -129,16 +125,6 @@ var DatabaseStore = {
           } else {
             return false;
           }
-        })
-    },
-
-    //reset database
-    resetDatabaseAsync: function(){
-      let client=this.connectToDatabase(); //connect to database
-      return client.flushallAsync()
-        .then(function(redisResponse){
-          client.quit();
-          return(redisResponse)
         })
     },
 
@@ -173,6 +159,65 @@ var DatabaseStore = {
             return(list)
           })
     },
+
+
+    //get the user details entered against a particular CLA (these may be diff to the users profile details)
+    getCLADetailsAsync: function(githubId, claName){
+      let client = this.connectToDatabase(); //connect to database
+      let key = "CLA:"+claName+":"+githubId;
+
+      return client.hgetallAsync(key)
+        .then(function(CLADetails){
+          client.quit() //close connection to database
+          return(CLADetails)
+        })
+    },
+
+    //store the user details entered against a particular CLA (entered when user signs the CLA)
+    storeCLADetailsAsync: function(githubId, claName, claDetails){
+      let client = this.connectToDatabase(); //connect to database
+      let key = "CLA:"+claName+":"+githubId;
+
+      return client.hmsetAsync(key, claDetails)
+        .then(function(redisResponse){
+          client.quit() //close connection to database
+          return(redisResponse)
+        })
+    },
+
+    getCLAContentAsync: function(claName){
+      let client = this.connectToDatabase(); //connect to database
+      let key = "CLA:"+claName+":";
+
+      return client.hgetallAsync(key)
+        .then(function(CLAContent){
+          client.quit() //close connection to database
+          return(CLAContent)
+        })
+    },
+
+    storeCLAContentAsync: function(claContent){
+      let client = this.connectToDatabase(); //connect to database
+      let key = "CLA:"+claContent["name"]+":";
+
+      return client.hmsetAsync(key, claContent)
+        .then(function(redisResponse){
+          client.quit() //close connection to database
+          return(redisResponse)
+        })
+    },
+
+    //reset database
+    resetDatabaseAsync: function(){
+      let client=this.connectToDatabase(); //connect to database
+      return client.flushallAsync()
+        .then(function(redisResponse){
+          client.quit();
+          return(redisResponse)
+        })
+    },
+
+
 
 }
 

@@ -65,7 +65,7 @@ describe("Database Interactions", function(){
   describe("Add a new CLA agreement to list of users CLAs", function(){
 
     it("adds a new version number to a set of CLAs associated with githubId", function(){
-      let promises =[];
+    let promises =[];
       promises.push(databaseStore.addCLAVersionAsync(testGithubId, testCLA1, testCLADetails));
       promises.push(databaseStore.addCLAVersionAsync(testGithubId, testCLA2, testCLADetails));
       return Promise.all(promises)
@@ -79,7 +79,7 @@ describe("Database Interactions", function(){
         })
         .then(function(signed){
           expect(signed).to.equal(true);
-          return databaseStore.checkCLAAsync(testGithubId, "version 3");
+           return databaseStore.checkCLAAsync(testGithubId, "version 3");
         })
         .then(function(signed){
           expect(signed).to.be.equal(false);
@@ -116,6 +116,20 @@ describe("Database Interactions", function(){
         .then(function(list){
           expect(list).to.eql({"cla-tracker/dummydata":"version 1"})
       })
+    })
+  })
+
+  describe("store and return the CLA details entered by a user for a CLA", function(){
+
+    it("sets user details stored against a CLA and retrieves them successfully", function(){
+      return databaseStore.storeCLADetailsAsync("12345", "TestCLA", {"full name":"test user", "email":"testemail"})
+        .then(function(redisResponse){
+          expect(redisResponse).to.equal("OK")
+          return databaseStore.getCLADetailsAsync("12345", "TestCLA")
+        })
+        .then(function(claDetails){
+          expect(claDetails).to.eql({"full name":"test user", "email":"testemail"})
+        })
     })
   })
 
