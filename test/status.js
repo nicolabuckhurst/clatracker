@@ -1,18 +1,22 @@
 var chai = require("chai");
 var chaiHttp = require("chai-http");
+
 var expect = require("chai").expect;
 
-var app = require("../app");
+var app = require("../app")
+
 
 //access extra chaiHttp utilities not as stadard in chai export
 chai.use(chaiHttp);
 
 describe("/status any HTTP requests", function(){
+
   it("should respond with a 200", function(){
     //request / with a GET method...VERY IMPORTANT to return the promise to the
     //enclosing describe function...otherwise no tests will actually execute
     //and this test will be always green!!
-    return chai.request(app).get('/status')
+    var requester = chai.request(app)
+    return requester.get('/status')
       //we are using promises version of chai so this will return a Promise
       .then(function(res){
         expect(res.status).to.equal(200);
