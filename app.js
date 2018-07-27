@@ -37,7 +37,7 @@ passport.use(new Strategy({
     clientID: process.env.CLIENT_ID,
     clientSecret: process.env.CLIENT_SECRET,
     callbackURL: process.env.GITHUB_RETURN,
-    profileFields:['email','photos','displayName','login']
+    profileFields:['email','photos','username','id']
   },
   //the strategy obect contains your verify function which takes the accessToken,
   //refreshToken and profile from github. You can write this to your database or
@@ -55,24 +55,21 @@ passport.use(new Strategy({
     //if the uswr can't be found in database
     databaseStore.retrieveContributorDetailsAsync(profile.id)
       .then(function(userDetails){
-        //then if user is not found create a user object from the facebook profile
+        //create a user object from the facebook profile
         //and return a promise chain that promises to store the user in the
-        //database and then return that user object.
-        if(userDetails == null){
-          console.log(profile)
-          user.login = profile.login;
-          user.id = profile.id;
-          user.githubPicture = profile.avatar_url;
-          user.admin = false;
-          return databaseStore.storeContributorDetailsAsync(profile.id, user)
-            .then(function(){
-              return databaseStore.retrieveContributorDetailsAsync(profile.id)
-            });
-        //else if user is already in the database promise to return that user object
-        //this is a promise to return user details as it is being returned from a then
-        }else{
-          return userDetails;
-        }
+        //database and then return that user object --if user is already
+        //in database then storeContributorDetailsAsync will update the data in the
+        //database
+        console.log(profile)
+        user.login = profile.username;
+        user.id = profile.id;
+        user.githubPicture = profile.photos[0]["value"];
+        user.admin = false;
+        user.email = profile.emails[0]["value"];
+        return databaseStore.storeContributorDetailsAsync(profile.id, user)
+          .then(function(){
+            return databaseStore.retrieveContributorDetailsAsync(profile.id)
+          });
       })
       // then finally when all the previous promises have resolved call done(null, user)
       // to make passport put the user into the req.object

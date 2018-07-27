@@ -10,14 +10,14 @@ router.get('/github', passport.authenticate('github', { scope: [ 'user:email, re
 router.get('/github/return', passport.authenticate('github', { failureRedirect: '/CLA'}),
   function(req, res){
     console.log(req.user);
-    res.redirect('/CLA')
+    res.redirect('back') //redirect to referrer or to /
   }
 );
 
 router.get('/logout', function(req, res, next){
   req.logout();
   console.log(req.user)
-  res.redirect('/CLA');
+  res.redirect('/'); //redirect back to homepage
 });
 
 module.exports = router;
