@@ -1,11 +1,84 @@
 <!DOCTYPE html>
 <html>
+
   <head>
     <title><%= title %></title>
+
+    <!--required meta tags-->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1,
+             shrink-to-fit=no">
+
+    <!--link to Bootstrap CSS-->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+
+    <!--link to custome css-->
     <link rel='stylesheet' href='/stylesheets/style.css' />
+
+    <!--link to bootstrap social css-->
+    <link rel='stylesheet' href='/stylesheets/bootstrap-social.css' />
+
+    <!--link to fontawesome so we can include logos-->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.1/css/all.css" integrity="sha384-O8whS3fhG2OnA5Kas0Y9l3cfpmYjapjI0E4theH4iuMD+pLhbf6JI0jIMfYcK3yZ" crossorigin="anonymous">
+
   </head>
+
   <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
+    <div class="transparentBox d-flex flex-column" >
+
+      <!--wrap all the content except the footer in a div called content-->
+      <!--this is a  trick to make the footer stick to the bottom-->
+      <!--of the viewport even when very little content on page-->
+      <!--there are no Bootstrap classes to do this automatically-->
+      <!--make the transparentBox that holds the content and the footer-->
+      <!--display flex (d-flex in bootstrap makes a container display flex and-->
+      <!--turns direct children into flex items)-->
+      <!--make the flex direction column so the elements are added one below the-->
+      <!-- other just like block items so won't mess up any formatting-->
+      <!--then make the content div flex-grow-1 so it grows in size to fill all-->
+      <!--space in transparentBox (which is already set to height 100vh in css file)-->
+      <!--just leaving space for the footer-->
+
+        <div class="content flex-grow-1">
+          <!--array of objects for details of links in navbar-->
+          <% var links = [{url:"/", label:"Home", active:true}] %>
+                    <!--{url:"#", label:"TestLink1", active:false},
+                    {url:"#",label:"TestLink2", active:false}];%>-->
+
+          <!--include navbar defined in navbar partial-->
+          <% include partials/navbar %>
+
+          <div class="contaner-fluid">
+            <div class="row">
+              <div class="col-12 ">
+                <div class="h1 text-center mb-4">
+                  Contributor Licence Agreement Tracker
+                </div>
+              </div>
+            </div>
+
+            <div class="row justify-content-center">
+              <div class="col-8">
+                <p class="text-justify">
+                  Sign in with Github in order to view details of your signed CLA agreements
+                </p>
+              </div>
+            </div>
+
+          </div>
+
+
+      </div>
+
+      <!--include footer-->
+      <% include partials/footer %>
+
+    </div>
+
+    <!--Bootstrap javascript-->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
   </body>
 </html>
