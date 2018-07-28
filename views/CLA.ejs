@@ -78,6 +78,34 @@
               </div>
             </div>
 
+            <div class="row justify-content-center mb-4">
+              <div class="col-8">
+                <%- claContents["text"] %>
+              </div>
+            </div>
+
+            <div class ="row justify-content-center mb-4">
+              <div class="col-8">
+                <form action="/CLA" method="post">
+                  <h4>Optional Fields</h4>
+                  <% for(property in claContents["optional fields"]){%>
+                    <div class="form-group">
+                      <label for="<%=property%>"><%=property%></label>
+                      <input type="<%=claContents["optional fields"][property]%>" name="<%=property%>" class="form-control">
+                    </div>
+                  <%}%>
+                  <h4>Required Fields</h4>
+                  <% for(property in claContents["required fields"]){%>
+                    <div class="form-group">
+                      <label for="<%=property%>"><%=property%></label>
+                      <input type="<%=claContents["required fields"][property]%>" name="<%=property%>" class="form-control">
+                    </div>
+                  <%}%>
+                  <button type="submit" class="btn btn-primary mt-4">Submit</button>
+                </form>
+              </div>
+            </div>
+
           </div>
 
 
