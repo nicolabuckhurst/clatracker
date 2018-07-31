@@ -122,9 +122,9 @@ describe("Database Interactions", function(){
   describe("store and return the CLA details entered by a user for a CLA", function(){
 
     it("sets user details stored against a CLA and retrieves them successfully", function(){
-      return databaseStore.storeCLADetailsAsync("12345", "TestCLA", {"full name":"test user", "email":"testemail"})
-        .then(function(redisResponse){
-          expect(redisResponse).to.equal("OK")
+      return databaseStore.addCLAVersionAsync("12345", "TestCLA", {"full name":"test user", "email":"testemail"})
+        .then(function(redisResponses){
+          expect(redisResponses).to.eql([1,"OK"])
           return databaseStore.getCLADetailsAsync("12345", "TestCLA")
         })
         .then(function(claDetails){

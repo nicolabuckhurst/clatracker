@@ -79,7 +79,8 @@ var DatabaseStore = {
       let client=this.connectToDatabase(); //connect to database
 
       let CLAListKey = "CLAList:"+githubId;
-      let CLADetailsKey="CLA:"+version+":"+githubId;
+      let CLAVersionNoSpaces = version.replace(" ","")
+      let CLADetailsKey="CLA:"+CLAVersionNoSpaces+":"+githubId;
 
       let promises =[];
 
@@ -93,6 +94,19 @@ var DatabaseStore = {
           console.log(redisResponses);
           client.quit() //close connection to data
           return(redisResponses)
+        })
+    },
+
+    //get the user details entered against a particular CLA (these may be diff to the users profile details)
+    getCLADetailsAsync: function(githubId, claName){
+      let client = this.connectToDatabase(); //connect to database
+      let claNameNoSpaces = claName.replace(" ","")
+      let key = "CLA:"+claNameNoSpaces+":"+githubId;
+
+      return client.hgetallAsync(key)
+        .then(function(CLADetails){
+          client.quit() //close connection to database
+          return(CLADetails)
         })
     },
 
@@ -160,31 +174,6 @@ var DatabaseStore = {
           })
     },
 
-
-    //get the user details entered against a particular CLA (these may be diff to the users profile details)
-    getCLADetailsAsync: function(githubId, claName){
-      let client = this.connectToDatabase(); //connect to database
-      let key = "CLA:"+claName+":"+githubId;
-
-      return client.hgetallAsync(key)
-        .then(function(CLADetails){
-          client.quit() //close connection to database
-          return(CLADetails)
-        })
-    },
-
-    //store the user details entered against a particular CLA (entered when user signs the CLA)
-    storeCLADetailsAsync: function(githubId, claName, claDetails){
-      let client = this.connectToDatabase(); //connect to database
-      let key = "CLA:"+claName+":"+githubId;
-
-      return client.hmsetAsync(key, claDetails)
-        .then(function(redisResponse){
-          client.quit() //close connection to database
-          return(redisResponse)
-        })
-    },
-
     getCLAContentAsync: function(claName){
       let client = this.connectToDatabase(); //connect to database
       let key = "CLA:"+claName+":";
@@ -201,7 +190,7 @@ var DatabaseStore = {
       let key = "CLA:"+claContent["name"]+":";
 
       return client.hmsetAsync(key, claContent)
-        .then(function(redisResponse){
+        .then(function(redisResponse){ //responds with OK is successfully set
           client.quit() //close connection to database
           return(redisResponse)
         })

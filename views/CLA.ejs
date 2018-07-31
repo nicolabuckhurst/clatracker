@@ -52,7 +52,7 @@
             <div class="row">
               <div class="col-12 ">
                 <div class="h1 text-center mb-4">
-                  Contributor Licence Agreement
+                  <%=claContents["name"] + " Contributor Licence Agreement"%>
                 </div>
               </div>
             </div>
@@ -86,7 +86,8 @@
 
             <div class ="row justify-content-center mb-4">
               <div class="col-8">
-                <form action="/CLA" method="post">
+                <%//you cannot send spaces in URL parameters any spaces need to be encoded as %20%>
+                <form action=<%= "/CLA/" + claContents["name"].replace(" ", "%20") %> method="post">
                   <h4>Optional Fields</h4>
                   <% for(property in claContents["optional fields"]){%>
                     <div class="form-group">

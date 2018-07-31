@@ -59,9 +59,11 @@
 
             <div class="row justify-content-center">
               <div class="col-8">
-                <p class="text-justify">
-                  Sign in with Github in order to view details of your signed CLA agreements
-                </p>
+                <ul class="list-group">
+                  <% for(item in claList){ %>
+                    <li class="list-group-item"><%=claList[item]%></li>
+                  <%}%>
+                </ul>
               </div>
             </div>
 

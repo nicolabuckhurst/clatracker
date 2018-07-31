@@ -48,9 +48,12 @@ router.get("/", function(req, res, next){
 })
 
 
-router.post("/", function(req, res, next){
-  console.log(JSON.stringify(req.body))
-  res.redirect("/")
+router.post("/:claName", function(req, res, next){
+  console.log(req.params["claName"])
+  databaseStore.addCLAVersionAsync(req.user.id, req.params["claName"], req.body)
+    .then(function(response){
+      res.redirect("/")
+    })
 
 })
 
