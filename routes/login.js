@@ -3,14 +3,13 @@ var router = express.Router();
 
 var passport = require('passport');
 
-/* GET home page. */
 router.get('/github', passport.authenticate('github', { scope: [ 'user:email, read:user' ] }));
 
 
 router.get('/github/return', passport.authenticate('github', { failureRedirect: '/CLA'}),
   function(req, res){
-    console.log(req.user);
-    res.redirect('back') //redirect to referrer or to /
+    console.log("the user object returned"+JSON.stringify(req.user));
+    res.redirect(req.session.rdUrl)
   }
 );
 

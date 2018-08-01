@@ -66,7 +66,7 @@ router.post('/', function(req,res,next){
             githubInterface.setPullRequestStatusAsync(payloadData,
                                         { "state":"success",
                                           "description":"User has signed the relevant CLA ("+version+")",
-                                          "target_url":"http://localhost:3000/CLA/"+version,
+                                          "target_url":"https://86.148.168.169:3000",
                                           "context":"CLATracker"
                                         })
             break;
@@ -77,7 +77,7 @@ router.post('/', function(req,res,next){
             githubInterface.setPullRequestStatusAsync(payloadData,
                                         { "state":"failure",
                                           "description":"User must sign CLA "+ version+ " before this pull request can be merged",
-                                          "target_url":"http://localhost:3000/CLA/"+version,
+                                          "target_url":"https://86.148.168.169:3000/CLA/",
                                           "context":"CLATracker"
                                         })
             break;

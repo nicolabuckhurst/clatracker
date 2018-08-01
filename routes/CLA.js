@@ -15,6 +15,8 @@ var path = require('path')
 var converter = new showdown.Converter()
 
 router.get("/", function(req, res, next){
+  req.session.rdUrl = "/CLA"
+  
   let loggedIn, profilepicture
   //if user is alread logged in, set logged in to true and profilepicture so that navbar displays correctly
   if (req.user != null){

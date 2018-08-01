@@ -8,6 +8,8 @@ router.get('/', function(req, res, next) {
   let loggedIn, profilepicture
   let claList = {}
 
+  req.session.rdUrl = "/";
+
   if (req.user != null){
     loggedIn = true;
     profilePicture = req.user["githubPicture"]
@@ -21,7 +23,7 @@ router.get('/', function(req, res, next) {
     profilePicture = "#"
     res.render('index',{title: 'CLA Tracker', 'loggedIn':loggedIn, 'profilePicture':profilePicture, 'claList':claList})
   }
-  
+
 });
 
 module.exports = router;
