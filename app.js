@@ -25,7 +25,7 @@ var users = require('./routes/users');
 var githublistener = require('./routes/githublistener');
 var status = require('./routes/status');
 var cla = require('./routes/CLA');
-var login = require('./routes/login')
+var login = require('./routes/login');
 
 var app = express();
 

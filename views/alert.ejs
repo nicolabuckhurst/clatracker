@@ -12,11 +12,11 @@
     <!--link to Bootstrap CSS-->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
 
-    <!--link to bootstrap social css-->
-    <link rel='stylesheet' href='/stylesheets/bootstrap-social.css' />
-
     <!--link to custome css-->
     <link rel='stylesheet' href='/stylesheets/style.css' />
+
+    <!--link to bootstrap social css-->
+    <link rel='stylesheet' href='/stylesheets/bootstrap-social.css' />
 
     <!--link to fontawesome so we can include logos-->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.1/css/all.css" integrity="sha384-O8whS3fhG2OnA5Kas0Y9l3cfpmYjapjI0E4theH4iuMD+pLhbf6JI0jIMfYcK3yZ" crossorigin="anonymous">
@@ -41,7 +41,7 @@
 
         <div class="content flex-grow-1">
           <!--array of objects for details of links in navbar-->
-          <% var links = [{url:"/", label:"Home", active:false}] %>
+          <% var links = [{url:"/", label:"Home", active:true}] %>
                     <!--{url:"#", label:"TestLink1", active:false},
                     {url:"#",label:"TestLink2", active:false}];%>-->
 
@@ -52,57 +52,16 @@
             <div class="row">
               <div class="col-12 ">
                 <div class="h1 text-center mb-4">
-                  <%=claContents["name"] + " Contributor Licence Agreement"%>
+                  Contributor Licence Agreement Tracker
                 </div>
               </div>
             </div>
 
             <div class="row justify-content-center">
               <div class="col-8">
-                <p class="text-justify">
-                Thank you for your interest in contributing to an opensource project.
-                The BBC welcomes contributions from contract partners, hardware manufacturers,
-                and any interested parties.
+                <p>
+                  <%=message%>
                 </p>
-                <p class="text-justify">
-                In order to accept contributions, we need all contributors grant Us a licence
-                to the intellectual property rights in their Contributions. This Agreement
-                (“Agreement”) is intended to protect your rights as a contributor, and to help
-                ensure that the intellectual property contained within a project is available
-                to the whole community, to use and build on. The Agreement does not change Your
-                rights to use Your Contributions for any other purpose.
-                </p>
-                <p class="font-weight-bold">
-                Please read this Agreement carefully and provide the information requested below:
-                </p>
-              </div>
-            </div>
-
-            <div class="row justify-content-center mb-4">
-              <div class="col-8">
-                <%- claContents["text"] %>
-              </div>
-            </div>
-
-            <div class ="row justify-content-center mb-4">
-              <div class="col-8">
-                <form action="<%=postURL%>" method="post">
-                  <h4>Optional Fields</h4>
-                  <% for(property in claContents["optional fields"]){%>
-                    <div class="form-group">
-                      <label for="<%=property%>"><%=property%></label>
-                      <input type="<%=claContents["optional fields"][property]%>" name="<%=property%>" class="form-control">
-                    </div>
-                  <%}%>
-                  <h4>Required Fields</h4>
-                  <% for(property in claContents["required fields"]){%>
-                    <div class="form-group">
-                      <label for="<%=property%>"><%=property%></label>
-                      <input type="<%=claContents["required fields"][property]%>" name="<%=property%>" class="form-control">
-                    </div>
-                  <%}%>
-                  <button type="submit" class="btn btn-primary mt-4">Submit</button>
-                </form>
               </div>
             </div>
 

@@ -2,7 +2,7 @@ var githubStatusParameters =
 {
   "state":"success",
   "description":"testStatus",
-  "target_url":"testURL",
+  "target_url":"https://localhost:3000",
   "context":"CLATracker"
 }
 

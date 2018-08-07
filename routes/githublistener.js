@@ -55,42 +55,63 @@ router.post('/', function(req,res,next){
     //than a single promise chain as we need the version and the signed result to
     //be in scope at the end of the promise chain
     return Promise.join(promiseToReturnCLARequirements, promiseToCheckIfSigned,
-      function(version, signed){
-        console.log("version to be signed" +version)
+      function(claName, signed){
+        console.log("version to be signed" + claName)
         console.log("user has signed"+signed)
         switch(signed){
           //if user has signed send a success response and send 201 response
           case true:
             console.log("user has signed relevant CLA")
-            res.status(201).send("user has signed relevant CLA")
-            githubInterface.setPullRequestStatusAsync(payloadData,
+            return githubInterface.setPullRequestStatusAsync(payloadData["repoName"], payloadData["pullRequestSha"],
                                         { "state":"success",
-                                          "description":"User has signed the relevant CLA ("+version+")",
-                                          "target_url":"https://86.148.168.169:3000",
+                                          "description":"User has signed the relevant CLA version ( "+ claName +" )",
+                                          "target_url":"https://localhost:3000",
                                           "context":"CLATracker"
                                         })
+              .then(function(response){
+                if(response == "status set"){
+                  res.status(201).send("user has signed relevant CLA")
+                } else {
+                  res.status(500).send("something went wrong setting pull request status")
+                }
+              })
             break;
             // if user needs to sign CLA send success response and then set github status as failed
           case false:
             console.log("user has NOT signed relevant CLA")
-            res.status(202).send("user has NOT signed relevant CLA")
-            githubInterface.setPullRequestStatusAsync(payloadData,
+            return githubInterface.setPullRequestStatusAsync(payloadData["repoName"], payloadData["pullRequestSha"],
                                         { "state":"failure",
-                                          "description":"User must sign CLA "+ version+ " before this pull request can be merged",
-                                          "target_url":"https://86.148.168.169:3000/CLA/",
+                                          "description":"User must sign CLA "+ claName + " before this pull request can be merged",
+                                          //if you want to include spaces and / in url parameters...need to encode them
+                                          "target_url":"https://localhost:3000/CLA/"+claName.replace(" ","%20")+"/"+payloadData["repoName"].replace("/", "%2F")+"/"+payloadData["pullRequestSha"],
                                           "context":"CLATracker"
                                         })
+                .then(function(response){
+                  if(response == "status set"){
+                    res.status(202).send("user has NOT signed relevant CLA")
+                  } else {
+                    res.status(500).send("something went wrong setting pull request status")
+                  }
+                })
             break;
             //if no CLA is required send a success response and do nothing
           case "not required":
             console.log("CLA not required")
-            res.status(203).send("CLA not required")
-            githubInterface.setPullRequestStatusAsync(payloadData,
+            return githubInterface.setPullRequestStatusAsync(payloadData["repoName"],payloadData["pullRequestSha"],
                                         { "state":"success",
                                           "description":"No CLA required",
                                           "context":"CLATracker"
                                         })
+                .then(function(response){
+                  if(response == "status set"){
+                    res.status(203).send("CLA not required")
+                  } else {
+                    res.status(500).send("something went wrong setting pull request status")
+                  }
+                })
             break;
+
+
           default:
             console.log("something went wrong checking CLA signed status")
             res.status(500).send("unexpected output from checking whether CLA was signed")

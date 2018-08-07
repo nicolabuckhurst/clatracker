@@ -7,6 +7,7 @@ var chai_sinon = require("chai-sinon");
 var app = require("../app");
 
 var databaseStore = require("../models/DatabaseStore");
+var gitHubInterface = require("../models/GitHubInterface");
 
 //do not read in the .json file using requires() ...this checks the syntax for
 //the .json file and throws an error when you try and read the corrupt json file
@@ -109,12 +110,14 @@ describe("/githublistener POST",function(){
             .then(function(){
                 sinon.spy(databaseStore, "checkCLAAsync")
                 sinon.spy(databaseStore, "checkCLARequirementsAsync")
+                sinon.spy(gitHubInterface, "setPullRequestStatusAsync")
             })
           })
 
         after("remove spies", function(){
           databaseStore.checkCLARequirementsAsync.restore()
           databaseStore.checkCLAAsync.restore()
+          gitHubInterface.setPullRequestStatusAsync.restore()
         })
 
         it("it should call checkCLARequirementsAsync, checkCLAAsync, send a status to github and respond with status 201 if user has signed CLA", function(){
@@ -126,7 +129,7 @@ describe("/githublistener POST",function(){
             expect(res.status).to.equal(201);
             expect(databaseStore.checkCLARequirementsAsync).to.have.been.called;
             expect(databaseStore.checkCLAAsync).to.have.been.called;
-            expect(/*put in status test*/)
+            expect(gitHubInterface.setPullRequestStatusAsync).to.have.been.called;
           })
           .catch(function(err){
             throw err;
@@ -145,12 +148,14 @@ describe("/githublistener POST",function(){
             .then(function(){
               sinon.spy(databaseStore, "checkCLAAsync")
               sinon.spy(databaseStore, "checkCLARequirementsAsync")
+              sinon.spy(gitHubInterface, "setPullRequestStatusAsync")
             })
           })
 
         after("remove spies", function(){
           databaseStore.checkCLARequirementsAsync.restore()
           databaseStore.checkCLAAsync.restore()
+          gitHubInterface.setPullRequestStatusAsync.restore()
         })
 
         it("it should call checkCLARequirementsAsync, checkCLAAsync, send a status to github and respond with status 202 if user has NOT signed CLA", function(){
@@ -162,8 +167,7 @@ describe("/githublistener POST",function(){
             expect(res.status).to.equal(202);
             expect(databaseStore.checkCLARequirementsAsync).to.have.been.called;
             expect(databaseStore.checkCLAAsync).to.have.been.called;
-            expect()
-            expect(/*put in status test*/)
+            expect(gitHubInterface.setPullRequestStatusAsync).to.have.been.called;
           })
           .catch(function(err){
             throw err;
@@ -181,12 +185,14 @@ describe("/githublistener POST",function(){
             .then(function(){
               sinon.spy(databaseStore, "checkCLAAsync")
               sinon.spy(databaseStore, "checkCLARequirementsAsync")
+              sinon.spy(gitHubInterface, "setPullRequestStatusAsync")
             })
           })
 
         after("remove spies", function(){
           databaseStore.checkCLARequirementsAsync.restore()
           databaseStore.checkCLAAsync.restore()
+          gitHubInterface.setPullRequestStatusAsync.restore()
         })
 
         it("it should call checkCLARequirementsAsync, checkCLAAsync, send a status to github and respond with status 203 CLA not required", function(){
@@ -197,8 +203,7 @@ describe("/githublistener POST",function(){
           .then(function(res){
             expect(res.status).to.equal(203);
             expect(databaseStore.checkCLARequirementsAsync).to.have.been.called;
-            expect()
-            expect(/*put in status test*/)
+            expect(gitHubInterface.setPullRequestStatusAsync).to.have.been.called;
           })
           .catch(function(err){
             throw err;

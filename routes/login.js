@@ -9,6 +9,7 @@ router.get('/github', passport.authenticate('github', { scope: [ 'user:email, re
 router.get('/github/return', passport.authenticate('github', { failureRedirect: '/CLA'}),
   function(req, res){
     console.log("the user object returned"+JSON.stringify(req.user));
+    console.log("rdURL is" +req.session.rdUrl)
     res.redirect(req.session.rdUrl)
   }
 );
