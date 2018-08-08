@@ -83,7 +83,7 @@ router.post('/', function(req,res,next){
                                         { "state":"failure",
                                           "description":"User must sign CLA "+ claName + " before this pull request can be merged",
                                           //if you want to include spaces and / in url parameters...need to encode them
-                                          "target_url":"https://localhost:3000/CLA/"+claName.replace(" ","%20")+"/"+payloadData["repoName"].replace("/", "%2F")+"/"+payloadData["pullRequestSha"],
+                                          "target_url":"https://localhost:3000/CLA/" + encodeURIComponent(claName) + "/" + encodeURIComponent(payloadData["repoName"]) + "/" + encodeURIComponent(payloadData["pullRequestSha"]),
                                           "context":"CLATracker"
                                         })
                 .then(function(response){

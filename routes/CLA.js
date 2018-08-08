@@ -15,9 +15,6 @@ var path = require('path')
 
 var converter = new showdown.Converter()
 
-
-
-
 router.get("/:claName/:repoName/:pullRequestSha", function(req, res, next){
   let claName = req.params.claName
   let repoName = req.params.repoName
@@ -59,9 +56,9 @@ router.get("/:claName/:repoName/:pullRequestSha", function(req, res, next){
           .then(function(response){
           if(response == "status set"){
             //render a page that informs user they have already signed the CLA
-            res.render('alert',{message:"You have already signed the relevant CLA since submitting your pull request, the pullRequestStatus on github has been updated"})
+            res.render('alert',{"title":"Alert", "loggedIn":loggedIn, "profilePicture":profilePicture, message:"You have already signed the relevant CLA since submitting your pull request, the pull request status on Github has now been updated"})
           }else{
-            res.render('alert',{message:"You have already signed the relevant CLA since submitting your pull request, however there was a problem updating the pullRequestStatus on github. Please resubmit your pull request"})
+            res.render('alert',{"title":"Alert", "loggedIn":loggedIn, "profilePicture":profilePicture, message:"You have already signed the relevant CLA since submitting your pull request, however there was a problem updating the pull request status on Github. Please resubmit your pull request"})
           }
         })
       }
@@ -73,7 +70,7 @@ router.get("/:claName/:repoName/:pullRequestSha", function(req, res, next){
       //so we can trigger an update to the pullrequest status on github once the
       //cla is signed...so create a link that parses these parameters in url
       //encoding any special characters
-      let postURL = "/CLA/" + req.params.claName.replace(" ", "%20") + "/" + req.params.repoName.replace("/", "%2F") + "/" + req.params.pullRequestSha
+      let postURL = "/CLA/" + encodeURIComponent(req.params.claName) + "/" + encodeURIComponent(req.params.repoName) + "/" + encodeURIComponent(req.params.pullRequestSha)
 
       //we need to read in the markdown text content of the CLA
       let claContentsParsed ={}
