@@ -1,5 +1,3 @@
-var config = require("../config.js");
-
 var chai = require("chai");
 
 var expect = require("chai").expect;

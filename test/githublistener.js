@@ -1,3 +1,5 @@
+var config = require("../config.js");
+
 var chai = require("chai");
 var chaiHttp = require("chai-http");
 var expect = require("chai").expect;
