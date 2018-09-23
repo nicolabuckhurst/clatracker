@@ -8,6 +8,7 @@ var githubInterface=require("../models/GitHubInterface");
 
 var Promise = require("bluebird")
 
+//this route is called when github sends a payload via webhook
 router.post('/', function(req,res,next){
 
     //CHECK PAYLOAD IS VALID returns a failure object or a success object....see comments below
@@ -47,24 +48,20 @@ router.post('/', function(req,res,next){
         return "not required"
       }
     })
-    console.log(promiseToCheckIfSigned)
-
 
     //use Promise.join bluebird function to define a function that takes the result
     //from both resolved promises and execute given function....Do it this way rather
     //than a single promise chain as we need the version and the signed result to
     //be in scope at the end of the promise chain
     return Promise.join(promiseToReturnCLARequirements, promiseToCheckIfSigned,
-      function(claName, signed){
-        console.log("version to be signed" + claName)
-        console.log("user has signed"+signed)
+      function(requiredCLA, signed){
         switch(signed){
           //if user has signed send a success response and send 201 response
           case true:
             console.log("user has signed relevant CLA")
             return githubInterface.setPullRequestStatusAsync(payloadData["repoName"], payloadData["pullRequestSha"],
                                         { "state":"success",
-                                          "description":"User has signed the relevant CLA version ( "+ claName +" )",
+                                          "description":"User has signed the relevant CLA version ( "+ requiredCLA +" )",
                                           "target_url":"https://localhost:3000",
                                           "context":"CLATracker"
                                         },
@@ -77,14 +74,14 @@ router.post('/', function(req,res,next){
                 }
               })
             break;
-            // if user needs to sign CLA send success response and then set github status as failed
+          // if user needs to sign CLA send success response and then set github status as failed
           case false:
             console.log("user has NOT signed relevant CLA")
             return githubInterface.setPullRequestStatusAsync(payloadData["repoName"], payloadData["pullRequestSha"],
                                         { "state":"failure",
-                                          "description":"User must sign CLA "+ claName + " before this pull request can be merged",
+                                          "description":"User must sign CLA "+ requiredCLA + " before this pull request can be merged",
                                           //if you want to include spaces and / in url parameters...need to encode them
-                                          "target_url":"https://localhost:3000/CLA/" + encodeURIComponent(claName) + "/" + encodeURIComponent(payloadData["repoName"]) + "/" + encodeURIComponent(payloadData["pullRequestSha"]),
+                                          "target_url":"https://localhost:3000/CLA/" + encodeURIComponent(requiredCLA) + "/" + encodeURIComponent(payloadData["repoName"]) + "/" + encodeURIComponent(payloadData["pullRequestSha"]),
                                           "context":"CLATracker"
                                         },
                                         process.env.GITHUB_PERSONAL_ACCESS_TOKEN)
@@ -96,7 +93,7 @@ router.post('/', function(req,res,next){
                   }
                 })
             break;
-            //if no CLA is required send a success response and do nothing
+          //if no CLA is required send a success response and do nothing
           case "not required":
             console.log("CLA not required")
             return githubInterface.setPullRequestStatusAsync(payloadData["repoName"],payloadData["pullRequestSha"],
@@ -113,8 +110,7 @@ router.post('/', function(req,res,next){
                   }
                 })
             break;
-
-
+          //if checking CLA signed status returns an error
           default:
             console.log("something went wrong checking CLA signed status")
             res.status(500).send("unexpected output from checking whether CLA was signed")
@@ -126,13 +122,11 @@ router.post('/', function(req,res,next){
 var checkPayload = function(req){
   //don't process payloads that have no webhook secret set
   if(req.get('X-Hub-Signature')==undefined){
-    console.log("failed X-Hub-Signature");
     return {"status":"failed","message":"please configure secret for the webhook on this repository"}
   }
 
   //don't process payloads wherea data in non JSON format as verify Signature function won't work
   if(req.get('content-type')!='application/json'){
-    console.log("failed content-type is json");
     return {"status":"failed","message":"please configure webhook to send data as application/json"}
   }
 
@@ -142,7 +136,6 @@ var checkPayload = function(req){
     //-- this funtion is tested seperately
   } else {
     if(verifySignature(req.body, req.get('X-Hub-Signature'))==false) {
-      console.log("failed to match X-Hub-Signature");
       return {"status":"failed","message":"could not confirm payload was from github check content type is set to application/JSON in webhook"}
     }
   }

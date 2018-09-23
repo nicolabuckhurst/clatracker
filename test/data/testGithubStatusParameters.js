@@ -1,4 +1,4 @@
-var githubStatusParameters =
+var testGithubStatusParameters =
 {
   "state":"success",
   "description":"testStatus",
@@ -6,4 +6,4 @@ var githubStatusParameters =
   "context":"CLATracker"
 }
 
-module.exports=githubStatusParameters
+module.exports=testGithubStatusParameters

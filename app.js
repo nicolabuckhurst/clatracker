@@ -21,7 +21,6 @@ var redis = require('redis');
 
 
 var index = require('./routes/index');
-var users = require('./routes/users');
 var githublistener = require('./routes/githublistener');
 var status = require('./routes/status');
 var cla = require('./routes/CLA');
@@ -132,7 +131,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use('/', index);
-app.use('/users', users);
 app.use('/githublistener', githublistener);
 app.use('/status', status);
 app.use('/CLA', cla);

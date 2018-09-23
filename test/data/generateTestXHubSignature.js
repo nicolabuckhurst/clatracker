@@ -1,4 +1,7 @@
 //run this code from commandline to generate a test x-hub-signature
+//store the result from this as env variable VERIFICATION_TEST_XHUBSIGNATURE
+//this will be used to test the verifySignature function, if you select to run
+//this test
 var crypto = require('crypto');
 
 var data = require("./verificationTestPayload");

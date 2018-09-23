@@ -10,7 +10,7 @@ var showdown = require('showdown')
 
 //currently hardcoded location of claContents .json file
 //this will have to be looked up using claName and a file naming convention
-var claContents = require("../test/data/Apachev2.0.json")
+var claContents = require("../CLAFiles/Apachev2.0.json")
 
 var fs = require('fs');
 var path = require('path')
