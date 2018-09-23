@@ -35,13 +35,13 @@ router.post('/', function(req,res,next){
     //deal with user is not a member
     //create 2 seperate promises....to get CLA requirements, and then to check if user
     //has signed....the second can only resolve once the first has resolved
-    var promiseToReturnCLARequirements = databaseStore.checkCLARequirementsAsync(payloadData["repoName"]);
+    var promiseToReturnCLARequirements = databaseStore.retrieveCLARequirementsAsync(payloadData["repoName"]);
 
     var promiseToCheckIfSigned = promiseToReturnCLARequirements.then(function(version){
       //take the Required CLA version or null return and check if user has signed it
       if(version != null){
         //if a CLA is required check if user has signed it..returns true or false
-        return databaseStore.checkCLAAsync(payloadData["id"], version)
+        return databaseStore.checkCLASignedAsync(payloadData["id"], version)
       } else {
         //if no CLA is required return "not required" as signed status
         return "not required"
@@ -67,7 +67,8 @@ router.post('/', function(req,res,next){
                                           "description":"User has signed the relevant CLA version ( "+ claName +" )",
                                           "target_url":"https://localhost:3000",
                                           "context":"CLATracker"
-                                        })
+                                        },
+                                        process.env.GITHUB_PERSONAL_ACCESS_TOKEN)
               .then(function(response){
                 if(response == "status set"){
                   res.status(201).send("user has signed relevant CLA")
@@ -85,7 +86,8 @@ router.post('/', function(req,res,next){
                                           //if you want to include spaces and / in url parameters...need to encode them
                                           "target_url":"https://localhost:3000/CLA/" + encodeURIComponent(claName) + "/" + encodeURIComponent(payloadData["repoName"]) + "/" + encodeURIComponent(payloadData["pullRequestSha"]),
                                           "context":"CLATracker"
-                                        })
+                                        },
+                                        process.env.GITHUB_PERSONAL_ACCESS_TOKEN)
                 .then(function(response){
                   if(response == "status set"){
                     res.status(202).send("user has NOT signed relevant CLA")
@@ -101,7 +103,8 @@ router.post('/', function(req,res,next){
                                         { "state":"success",
                                           "description":"No CLA required",
                                           "context":"CLATracker"
-                                        })
+                                        },
+                                        process.env.GITHUB_PERSONAL_ACCESS_TOKEN)
                 .then(function(response){
                   if(response == "status set"){
                     res.status(203).send("CLA not required")

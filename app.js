@@ -53,12 +53,12 @@ passport.use(new Strategy({
     //return a promise to find user by github id...will either resolve to a
     //user object returned from database corresponding to this github id or null
     //if the uswr can't be found in database
-    databaseStore.retrieveContributorDetailsAsync(profile.id)
+    databaseStore.retrieveUserDetailsAsync(profile.id)
       .then(function(userDetails){
         //create a user object from the facebook profile
         //and return a promise chain that promises to store the user in the
         //database and then return that user object --if user is already
-        //in database then storeContributorDetailsAsync will update the data in the
+        //in database then storeUserDetailsAsync will update the data in the
         //database
         console.log(profile)
         user.login = profile.username;
@@ -66,9 +66,9 @@ passport.use(new Strategy({
         user.githubPicture = profile.photos[0]["value"];
         user.admin = false;
         user.email = profile.emails[0]["value"];
-        return databaseStore.storeContributorDetailsAsync(profile.id, user)
+        return databaseStore.storeUserDetailsAsync(profile.id, user)
           .then(function(){
-            return databaseStore.retrieveContributorDetailsAsync(profile.id)
+            return databaseStore.retrieveUserDetailsAsync(profile.id)
           });
       })
       // then finally when all the previous promises have resolved call done(null, user)
@@ -92,7 +92,7 @@ passport.use(new Strategy({
   });
 
   passport.deserializeUser(function(id, done) {
-    databaseStore.retrieveContributorDetailsAsync(id)
+    databaseStore.retrieveUserDetailsAsync(id)
       .then(function(user){
         done(null, user)
       })

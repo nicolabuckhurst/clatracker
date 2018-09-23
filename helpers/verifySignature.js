@@ -15,7 +15,7 @@ var verifySignature = function(payloadBody, xHubSignature){
 
   //use a timing safe equal function rather than == as its more secure as all
   //comparisons will take same time...the function in crypto can only compare
-  //Buffers so convert the 2 strings to compare to buffers
+  //buffers so convert the 2 strings to compare to buffers
   try{
     return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(xHubSignature))
   }

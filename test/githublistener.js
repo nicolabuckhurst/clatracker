@@ -77,11 +77,11 @@ describe("/githublistener POST",function(){
     describe("pull request opened by org member", function(){
 
       before("set a spy on database.checkCLA()", function(){
-        sinon.spy(databaseStore, "checkCLAAsync")
+        sinon.spy(databaseStore, "checkCLASignedAsync")
       })
 
       after("remove spy", function(){
-        databaseStore.checkCLAAsync.restore();
+        databaseStore.checkCLASignedAsync.restore();
       })
 
       it("it should respond with a 200 and not call database", function(){
@@ -91,7 +91,7 @@ describe("/githublistener POST",function(){
         .send(testpayloadMember)
         .then(function(res){
           expect(res.status).to.equal(200);
-          expect(databaseStore.checkCLAAsync).to.not.have.been.called;
+          expect(databaseStore.checkCLASignedAsync).to.not.have.been.called;
         })
         .catch(function(err){
             throw err;
@@ -105,32 +105,32 @@ describe("/githublistener POST",function(){
 
         before("set spies and add dummy data to database to database", function(){
           let promises = []
-          promises.push(databaseStore.setCLARequirementsAsync("cla-tracker/dummydata", "version 1"))
-          promises.push(databaseStore.storeContributorDetailsAsync("123456",{"login":"testUser"}))
-          promises.push(databaseStore.addCLAVersionAsync("123456","version 1",{"email":"testemail"}))
+          promises.push(databaseStore.storeCLARequirementsAsync("cla-tracker/dummydata", "version 1"))
+          promises.push(databaseStore.storeUserDetailsAsync("123456",{"login":"testUser"}))
+          promises.push(databaseStore.storeSignedCLADetailsAsync("123456","version 1",{"email":"testemail"}))
           return Promise.all(promises)
             .then(function(){
-                sinon.spy(databaseStore, "checkCLAAsync")
-                sinon.spy(databaseStore, "checkCLARequirementsAsync")
+                sinon.spy(databaseStore, "checkCLASignedAsync")
+                sinon.spy(databaseStore, "retrieveCLARequirementsAsync")
                 sinon.spy(gitHubInterface, "setPullRequestStatusAsync")
             })
           })
 
         after("remove spies", function(){
-          databaseStore.checkCLARequirementsAsync.restore()
-          databaseStore.checkCLAAsync.restore()
+          databaseStore.retrieveCLARequirementsAsync.restore()
+          databaseStore.checkCLASignedAsync.restore()
           gitHubInterface.setPullRequestStatusAsync.restore()
         })
 
-        it("it should call checkCLARequirementsAsync, checkCLAAsync, send a status to github and respond with status 201 if user has signed CLA", function(){
+        it("it should call retrieveCLARequirementsAsync, checkCLASignedAsync, send a status to github and respond with status 201 if user has signed CLA", function(){
           return chai.request(app).post('/githublistener')
           .type("application/json")
           .set('X-Hub-Signature', "")
           .send(testpayloadContributor)
           .then(function(res){
             expect(res.status).to.equal(201);
-            expect(databaseStore.checkCLARequirementsAsync).to.have.been.called;
-            expect(databaseStore.checkCLAAsync).to.have.been.called;
+            expect(databaseStore.retrieveCLARequirementsAsync).to.have.been.called;
+            expect(databaseStore.checkCLASignedAsync).to.have.been.called;
             expect(gitHubInterface.setPullRequestStatusAsync).to.have.been.called;
           })
           .catch(function(err){
@@ -143,32 +143,32 @@ describe("/githublistener POST",function(){
 
         before("set spies and add dummy data to database to database", function(){
           let promises = []
-          promises.push(databaseStore.setCLARequirementsAsync("cla-tracker/dummydata", "version 1"))
-          promises.push(databaseStore.storeContributorDetailsAsync("123456",{"login":"testUser"}))
-          promises.push(databaseStore.addCLAVersionAsync("123456","version 2",{"email":"testemail"}))
+          promises.push(databaseStore.storeCLARequirementsAsync("cla-tracker/dummydata", "version 1"))
+          promises.push(databaseStore.storeUserDetailsAsync("123456",{"login":"testUser"}))
+          promises.push(databaseStore.storeSignedCLADetailsAsync("123456","version 2",{"email":"testemail"}))
           return Promise.all(promises)
             .then(function(){
-              sinon.spy(databaseStore, "checkCLAAsync")
-              sinon.spy(databaseStore, "checkCLARequirementsAsync")
+              sinon.spy(databaseStore, "checkCLASignedAsync")
+              sinon.spy(databaseStore, "retrieveCLARequirementsAsync")
               sinon.spy(gitHubInterface, "setPullRequestStatusAsync")
             })
           })
 
         after("remove spies", function(){
-          databaseStore.checkCLARequirementsAsync.restore()
-          databaseStore.checkCLAAsync.restore()
+          databaseStore.retrieveCLARequirementsAsync.restore()
+          databaseStore.checkCLASignedAsync.restore()
           gitHubInterface.setPullRequestStatusAsync.restore()
         })
 
-        it("it should call checkCLARequirementsAsync, checkCLAAsync, send a status to github and respond with status 202 if user has NOT signed CLA", function(){
+        it("it should call retrieveCLARequirementsAsync, checkCLASignedAsync, send a status to github and respond with status 202 if user has NOT signed CLA", function(){
           return chai.request(app).post('/githublistener')
           .type("application/json")
           .set('X-Hub-Signature', "")
           .send(testpayloadContributor)
           .then(function(res){
             expect(res.status).to.equal(202);
-            expect(databaseStore.checkCLARequirementsAsync).to.have.been.called;
-            expect(databaseStore.checkCLAAsync).to.have.been.called;
+            expect(databaseStore.retrieveCLARequirementsAsync).to.have.been.called;
+            expect(databaseStore.checkCLASignedAsync).to.have.been.called;
             expect(gitHubInterface.setPullRequestStatusAsync).to.have.been.called;
           })
           .catch(function(err){
@@ -181,30 +181,30 @@ describe("/githublistener POST",function(){
 
         before("set spies and add dummy data to database to database", function(){
           let promises = []
-          promises.push(databaseStore.storeContributorDetailsAsync("123456",{"login":"testUser"}))
-          promises.push(databaseStore.addCLAVersionAsync("123456","version 1",{"email":"testemail"}))
+          promises.push(databaseStore.storeUserDetailsAsync("123456",{"login":"testUser"}))
+          promises.push(databaseStore.storeSignedCLADetailsAsync("123456","version 1",{"email":"testemail"}))
           return Promise.all(promises)
             .then(function(){
-              sinon.spy(databaseStore, "checkCLAAsync")
-              sinon.spy(databaseStore, "checkCLARequirementsAsync")
+              sinon.spy(databaseStore, "checkCLASignedAsync")
+              sinon.spy(databaseStore, "retrieveCLARequirementsAsync")
               sinon.spy(gitHubInterface, "setPullRequestStatusAsync")
             })
           })
 
         after("remove spies", function(){
-          databaseStore.checkCLARequirementsAsync.restore()
-          databaseStore.checkCLAAsync.restore()
+          databaseStore.retrieveCLARequirementsAsync.restore()
+          databaseStore.checkCLASignedAsync.restore()
           gitHubInterface.setPullRequestStatusAsync.restore()
         })
 
-        it("it should call checkCLARequirementsAsync, checkCLAAsync, send a status to github and respond with status 203 CLA not required", function(){
+        it("it should call retrieveCLARequirementsAsync, checkCLASignedAsync, send a status to github and respond with status 203 CLA not required", function(){
           return chai.request(app).post('/githublistener')
           .type("application/json")
           .set('X-Hub-Signature', "")
           .send(testpayloadContributor)
           .then(function(res){
             expect(res.status).to.equal(203);
-            expect(databaseStore.checkCLARequirementsAsync).to.have.been.called;
+            expect(databaseStore.retrieveCLARequirementsAsync).to.have.been.called;
             expect(gitHubInterface.setPullRequestStatusAsync).to.have.been.called;
           })
           .catch(function(err){

@@ -13,7 +13,7 @@ router.get('/', function(req, res, next) {
   if (req.user != null){
     loggedIn = true;
     profilePicture = req.user["githubPicture"]
-    return databaseStore.getCLAVersionsAsync(req.user["id"])
+    return databaseStore.retrieveUserCLAVersions(req.user["id"])
       .then(function(claList){
           console.log(claList)
           res.render('index', { title: 'CLA Tracker', 'loggedIn':loggedIn, 'profilePicture':profilePicture, 'claList':claList});
