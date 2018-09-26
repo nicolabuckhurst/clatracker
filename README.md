@@ -15,14 +15,18 @@ Details of which CLAs a user has signed and the CLA requirements for a particula
 make sure you have Node and Redis installed
 
 ### Install and Run clatracker app
-git clone git@github.com:cla-tracker/clatracker.git *or clone your own fork*\
+```
+git clone git@github.com:cla-tracker/clatracker.git\
 cd clatracker\
 npm install\
 npm start\
+```
 clatracker should now be running on localhost:3000
 
 ### Run Redis Server
+```
 redis-server\
+```
 a redis server should now be running on port 6379
 
 
