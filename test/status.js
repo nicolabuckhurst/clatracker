@@ -6,7 +6,7 @@ var expect = require("chai").expect;
 var app = require("../app")
 
 
-//access extra chaiHttp utilities not as stadard in chai export
+//access extra chaiHttp utilities not as standard in chai export
 chai.use(chaiHttp);
 
 describe("/status any HTTP requests", function(){
