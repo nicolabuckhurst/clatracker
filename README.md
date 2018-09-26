@@ -27,8 +27,6 @@ git clone git@github.com:cla-tracker/clatracker.git
 cd clatracker
 npm install
 ```
-clatracker should now be running on localhost:3000
-
 
 #### Configure clatracker app (in the shell where you installed the clatracker app)
 - Ensure that the clatracker app is externally visible
@@ -61,7 +59,12 @@ clatracker should now be running on localhost:3000
 - Create a Gitub OAUTH App
   - Select `Settings` from dropdown at top-right of screen
   - Select `Developer Settings`
-  - Select `OAUTH 
+  - Select `OAUTH apps` and create an OAUTH app as follows:
+    - `Application Name`: CLATracker
+    - `Homepage URL`: https:localhost:3000
+    - `Application Description`: Application to manage CLA requirements on opensource projects
+    - `Authorisation callback URL`:https://localhost:3000/login/github/return
+  
  
 
 
