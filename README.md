@@ -15,7 +15,7 @@ Details of which CLAs a user has signed and the CLA requirements for a particula
 make sure you have Node and Redis installed
 
 ### Install and Run clatracker app
-git@github.com:cla-tracker/clatracker.git *or clone your own fork*\
+git clone git@github.com:cla-tracker/clatracker.git *or clone your own fork*\
 cd clatracker\
 npm install\
 npm start\
