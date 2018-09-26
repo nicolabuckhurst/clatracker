@@ -59,7 +59,9 @@ clatracker should now be running on localhost:3000
 - Expose the github personal access token to the clatracker app using environment variable\
 ```export GITHUB_PERSONAL_ACCESS_TOKEN="PERSONAL ACCESS TOKEN"```
 - Create a Gitub OAUTH App
-  -
+  - Select `Settings` from dropdown at top-right of screen
+  - Select `Developer Settings`
+  - Select `OAUTH 
  
 
 
