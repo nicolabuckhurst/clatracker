@@ -21,7 +21,7 @@ redis-server
 a redis server should now be running on port 6379
 
 #### Install clatracker app
-In a new shell\
+In a new shell
 ```
 git clone git@github.com:cla-tracker/clatracker.git
 cd clatracker
@@ -30,7 +30,7 @@ npm install
 clatracker should now be running on localhost:3000
 
 
-### Configure clatracker app (in the shell where you installed the clatracker app)
+#### Configure clatracker app (in the shell where you installed the clatracker app)
 - Ensure you are running the clatracker app on an externally visible IP address...we will refer to this as APP_URL
 
 - Expose your Redis server by setting an environment variable\
@@ -45,7 +45,13 @@ clatracker should now be running on localhost:3000
   - Tick `Active`
  - Expose your webhook secret to the clatracker app using an environment variable\
  ```export WEBHOOK_SECRET_TOKEN="WEBHOOK_SECRET"```
- 
+- Generate a github personal access token to authenticate any calls to the github API. You must ensure that user who creates this personal access token has write access to any repositories you want to hook up to the clatracker app
+  - Select `Settings` from dropdown at top-right of screen
+  - Select `Developer Settings`
+  - Select `Personal Access Tokens`
+  - Select `Generate New Token` and create a token as follows:
+    - `Token description`: add any description
+    - `Select scopes`: select all options under `repo`
  
 
 
