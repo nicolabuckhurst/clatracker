@@ -1,4 +1,4 @@
-//run this code from commandline to generate a test x-hub-signature
+//run this code from commandline to generate a test x-hub-signature based on the verifySignatureTestPayload
 //store the result from this as env variable VERIFICATION_TEST_XHUBSIGNATURE
 //this will be used to test the verifySignature function, if you select to run
 //this test
