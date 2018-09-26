@@ -6,7 +6,7 @@ var expect = require("chai").expect;
 
 var databaseStore = require("../models/DatabaseStore");
 
-//Dummy test contributor details
+//simple test data..to test reading and writing from database..no need to use full testPayload from github
 var testGithubId ="12345";
 var testUserDetails = {"login":"testuser"}
 var testCLA1 = "version 1"
