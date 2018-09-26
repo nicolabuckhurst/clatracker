@@ -8,16 +8,23 @@ If a CLA is required but has not been signed by the contributor the pull request
 Details of which CLAs a user has signed and the CLA requirements for a particular github project are stored in a Redis database, which must be set up alongside the clatracker app.
 
 ## Requirements
-[Node.js](https://nodejs.org/en/) . 
+[Node.js](https://nodejs.org/en/)\
 [Redis](https://redis.io/download)
 
 ## Install
 make sure you have Node and Redis installed
 
-git@github.com:cla-tracker/clatracker.git * *or clone your own fork* *
-cd clatracker
-npm install
-npm start
+### Install and Run clatracker app
+git@github.com:cla-tracker/clatracker.git *or clone your own fork*\
+cd clatracker\
+npm install\
+npm start\
+clatracker should now be running on localhost:3000
+
+### Run Redis Server
+redis-server\
+a redis server should now be running on port 6379
+
 
 
 
