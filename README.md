@@ -31,7 +31,11 @@ clatracker should now be running on localhost:3000
 
 
 #### Configure clatracker app (in the shell where you installed the clatracker app)
-- Ensure you are running the clatracker app on an externally visible IP address...we will refer to this as APP_URL
+- Ensure that the clatracker app is externally visible
+  - Find out the external IP address of your home network 
+  - Go into your router settings and map an external port number to the port and interal IP address of the machine running the
+  clatracker app.
+  - We will refer to the external url as APP_URL
 
 - Expose your Redis server by setting an environment variable\
 ```export REDIS_DEV_URL="redis://localhost:6379"```
@@ -52,6 +56,10 @@ clatracker should now be running on localhost:3000
   - Select `Generate New Token` and create a token as follows:
     - `Token description`: add any description
     - `Select scopes`: select all options under `repo`
+- Expose the github personal access token to the clatracker app using environment variable\
+```export GITHUB_PERSONAL_ACCESS_TOKEN="PERSONAL ACCESS TOKEN"```
+- Create a Gitub OAUTH App
+  -
  
 
 
