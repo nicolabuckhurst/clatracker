@@ -37,33 +37,49 @@ npm install
 
 - Expose your Redis server by setting an environment variable\
 ```export REDIS_DEV_URL="redis://localhost:6379"```
+
 - Create a test repo on github, or select an existing repo ensuring that you have write access
-- Go into repository settings and select `Webhooks` and then `add webhook` and setup your webhook as follows:
-  - `PayloadURL`: https://APP_URL/githublistener
-  - `Content Type`: application/json *currently this app only supports application/json webhooks*
-  - `Secret`:type a random string with high entropy we will refer to this as WEBHOOK_SECRET
-  - `SSL Verification`: if running app locally for development you can disable ssl verification
-  - Select `Let me select individual events` and then tick `Pull requests`
-  - Tick `Active`
- - Expose your webhook secret to the clatracker app using an environment variable\
- ```export WEBHOOK_SECRET_TOKEN="WEBHOOK_SECRET"```
-- Generate a github personal access token to authenticate any calls to the github API. You must ensure that user who creates this personal access token has write access to any repositories you want to hook up to the clatracker app
+
+- Set up a webhook from test repository to clatracker to send a payload when a pull-request is created
+  - Go intothe test repositories settings and select `Webhooks` and then `add webhook` and setup your webhook as follows:
+    - `PayloadURL`: https://APP_URL/githublistener
+    - `Content Type`: application/json *currently this app only supports application/json webhooks*
+    - `Secret`:type a random string with high entropy we will refer to this as WEBHOOK_SECRET
+    - `SSL Verification`: if running app locally for development you can disable ssl verification
+    - Select `Let me select individual events` and then tick `Pull requests`
+    - Tick `Active`
+  - Expose your webhook secret to the clatracker app using an environment variable\
+  ```export WEBHOOK_SECRET_TOKEN="WEBHOOK_SECRET"```
+
+- Set up a github personal access token to authenticate calls to the github API when clatracker app updates pull-request statuses to inform the github user if they need to sign a CLA. You must ensure that user who creates this personal access token has write access to any repositories you want to hook up to the clatracker app
   - Select `Settings` from dropdown at top-right of screen
   - Select `Developer Settings`
   - Select `Personal Access Tokens`
   - Select `Generate New Token` and create a token as follows:
     - `Token description`: add any description
     - `Select scopes`: select all options under `repo`
-- Expose the github personal access token to the clatracker app using environment variable\
-```export GITHUB_PERSONAL_ACCESS_TOKEN="PERSONAL ACCESS TOKEN"```
-- Create a Gitub OAUTH App
+  - Expose the github personal access token to the clatracker app using environment variable\
+  ```export GITHUB_PERSONAL_ACCESS_TOKEN="PERSONAL ACCESS TOKEN"```
+
+- Create a Gitub OAUTH App, this is used when user logs into clatracker app in order to get the GITHUB profile of that user
   - Select `Settings` from dropdown at top-right of screen
   - Select `Developer Settings`
   - Select `OAUTH apps` and create an OAUTH app as follows:
     - `Application Name`: CLATracker
     - `Homepage URL`: https:localhost:3000
-    - `Application Description`: Application to manage CLA requirements on opensource projects
+    - `Application Description`: Give your app a description eg.application to manage CLA requirements on opensource projects
     - `Authorisation callback URL`:https://localhost:3000/login/github/return
+  - Select `Register Application`
+  - Expose your OAUTH app to clatracker app using environment variables\
+  `export CLIENT_ID="OAUTH_CLIENT_ID"`\
+  `export CLIENT_SECRET="OAUTH_CLIENT_SECRET"`\
+  `export GITHUB_RETURN=https://localhost:3000/login/github/return`
+
+#### Run clatracker app
+```
+npm start
+```
+ 
   
  
 
