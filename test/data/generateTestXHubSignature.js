@@ -4,7 +4,7 @@
 //this test
 var crypto = require('crypto');
 
-var data = require("./verificationTestPayload");
+var data = require("./verifySignatureTestPayload");
 
 //create a HMAC object with the required hash algorithm and the secret to be used
 const hmac = crypto.createHmac('sha1', process.env.WEBHOOK_SECRET_TOKEN);
