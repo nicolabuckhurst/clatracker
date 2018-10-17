@@ -3,8 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "export NODE_ENV=dev && nodemon ./bin/www",
-    "test": "export NODE_ENV=test && mocha test --exit"
+    "start": ". config.txt && export REDIS_URL=$REDIS_DEV_URL && nodemon ./bin/www",
+    "test": ". config.txt && export REDIS_URL=$REDIS_TEST_URL && mocha test --exit",
+    "admin": ". config.txt && export REDIS_URL=$REDIS_DEV_URL && node ./bin/admin"
   },
   "dependencies": {
     "bluebird": "^3.5.1",

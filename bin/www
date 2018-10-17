@@ -3,9 +3,7 @@
 /**
  * Module dependencies.
  */
-
-//run config file to set up env variable pointing to development database
-var config = require("../config.js");
+console.log(process.env);
 
 var app = require('../app');
 var debug = require('debug')('clatracker:server');
