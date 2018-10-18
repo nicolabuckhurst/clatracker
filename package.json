@@ -5,7 +5,7 @@
   "scripts": {
     "start":"node ./bin/www",
     "startlocal": ". config.txt && export REDIS_URL=$REDIS_DEV_URL && nodemon ./bin/www",
-    "test": ". config.txt && export NODE_ENV=test && export REDIS_URL=$REDIS_TEST_URL && mocha test --exit",
+    "test": ". config.txt && export NODE_ENV=test && export NODE_ENV=test && export REDIS_URL=$REDIS_TEST_URL && mocha test --exit",
     "admin": ". config.txt && export REDIS_URL=$REDIS_DEV_URL && node ./bin/admin",
     "CLA":". config.txt && export REDIS_URL=$REDIS_DEV_URL && node ./bin/CLA"
   },
