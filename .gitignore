@@ -34,3 +34,6 @@ npm-debug.log
 
 #dummy payload from github
 examplePayloads
+
+#local environment config file
+config.txt

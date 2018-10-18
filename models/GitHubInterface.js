@@ -31,6 +31,7 @@ var GitHubInterface = {
         if(githubresponse.status == "201"){
           return "status set"
         } else {
+          console.log("FAILED TO SET GITHUB STATUS" + githubresponse)
           return "status not set"
         }
       },
