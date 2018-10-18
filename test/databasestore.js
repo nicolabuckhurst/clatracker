@@ -1,6 +1,3 @@
-//run config file to set up env variables pointing to test database
-var config = require("../config.js");
-
 var chai = require("chai");
 var expect = require("chai").expect;
 
