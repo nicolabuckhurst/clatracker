@@ -36,4 +36,4 @@ npm-debug.log
 examplePayloads
 
 #local environment config file
-config.txt
+#config.txt
