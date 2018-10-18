@@ -3,6 +3,7 @@
 /**
  * Module dependencies.
  */
+ //log env variables to check they are being set corectly by config.txt
 console.log(process.env);
 
 var app = require('../app');
