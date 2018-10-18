@@ -90,6 +90,42 @@ var DatabaseStore = {
       })
   },
 
+  //add githubId to list of admin Users
+  addAdminUser: function(githubId){
+    let client=this.connectToDatabase(); //connect to database
+    let key = "adminUsers"; // key for storing list of admin users against
+
+    return client.saddAsync(key,githubId)
+      .then(function(response){
+        client.quit();
+        return response;
+      })
+  },
+
+  //remove githubId from the list of admin users
+  deleteAdminUser: function(githubId){
+    let client=this.connectTodatabase(); //connect to database
+    let key = "adminUsers"; //key of admin users
+
+    return client.sremAsync(key, githubId)
+      .then(function(response){
+        client.quit();
+        return response;
+      })
+  },
+
+  //check if a user has admin status
+  checkAdminStatus: function(githubId){
+    let client=this.connectTodatabase(); //connect to database
+    let key = "adminUsers"; //key of list of admin users
+
+    return client.sismemberAsync(key, githubId) //returns a 1 if user is admin user or 0 if not
+      .then(function(response){
+        client.quit();
+        return response;
+      })
+  },
+
   //save details when a CLA is signed including:
   // -- adding the CLA name to the list of CLAs stored against a user
   // -- storing the details of the signed CLA as a seperate entry in database
@@ -190,7 +226,7 @@ var DatabaseStore = {
       })
   },
 
-  //retrieve CLA content from database
+  //retrieve CLA content from database -- CURRENTLY NOT IN USE, cla details stored in a .json and .md file not in database
   retrieveCLAContentAsync: function(claVersion){
     let client = this.connectToDatabase(); //connect to database
     let key = "CLA:"+claVersion+":"; //create a key to store the CLA contents against CLA:CLAVersion
@@ -202,7 +238,7 @@ var DatabaseStore = {
       })
   },
 
-  //store the CLAContent in database.....
+  //store the CLAContent in database -- CURRENTL NOT IN USE, cla details stored in a .json and .md file not in database
   //takes an object as argument with key:value pairs describing content
   storeCLAContentAsync: function(claContent){
     let client = this.connectToDatabase(); //connect to database

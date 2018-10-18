@@ -63,7 +63,6 @@ passport.use(new Strategy({
         user.login = profile.username;
         user.id = profile.id;
         user.githubPicture = profile.photos[0]["value"];
-        user.admin = false;
         user.email = profile.emails[0]["value"];
         return databaseStore.storeUserDetailsAsync(profile.id, user)
           .then(function(){

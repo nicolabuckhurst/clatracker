@@ -5,7 +5,8 @@
   "scripts": {
     "start": ". config.txt && export REDIS_URL=$REDIS_DEV_URL && nodemon ./bin/www",
     "test": ". config.txt && export REDIS_URL=$REDIS_TEST_URL && mocha test --exit",
-    "admin": ". config.txt && export REDIS_URL=$REDIS_DEV_URL && node ./bin/admin"
+    "admin": ". config.txt && export REDIS_URL=$REDIS_DEV_URL && node ./bin/admin",
+    "CLA":". config.txt && export REDIS_URL=$REDIS_DEV_URL && node ./bin/CLA"
   },
   "dependencies": {
     "bluebird": "^3.5.1",

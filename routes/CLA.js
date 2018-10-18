@@ -79,7 +79,7 @@ router.get("/:claName/:repoName/:pullRequestSha", function(req, res, next){
 
       //we need to read in the markdown text content of the CLA
       let claContentsParsed ={}
-      let textPath = path.join(__dirname,'/../test/data/'+claContents["text"])
+      let textPath = path.join(__dirname,'/../CLAFiles/'+claContents["text"])
 
       //read the text content of the CLA asynchronously as a utf8 encoded string and then pass
       //data into callbackURL so that the markdown text gets parsed to html
