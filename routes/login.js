@@ -9,7 +9,7 @@ router.get('/github', passport.authenticate('github', { scope: [ 'user:email, re
 //this is the route called when github returns the authentication token..passport now requests an
 //access token from github...if successful user is logged in otherwise authentication has failed and will redirect
 //to failure redirect.
-router.get('/github/return', passport.authenticate('github', { failureRedirect: '/CLA'}),
+router.get('/github/return', passport.authenticate('github', { failureRedirect: '/'}),
   function(req, res){
     //if successfully logged on redirect to rdUrl stored in session ..makes sure the user gets redirected
     //back to the page they were on before they were redirected to login
@@ -25,4 +25,3 @@ router.get('/logout', function(req, res, next){
 });
 
 module.exports = router;
- 
