@@ -27,17 +27,16 @@ var bind = normalizePort(process.env.BIND || '127.0.0.1');
  * Create HTTP server.
  */
 
-//var server = http.createServer(app);
-var options={
-  key: fs.readFileSync(process.env.SSL_KEY),
-  cert: fs.readFileSync(process.env.SSL_CERT)
-}
-
 //when running locally need to run as self signed https or OAUTH authentication wont work
 //when deployed to heroku run as http and heroku manages https
 if(process.env.NODE_ENV == "production"){
   var server = http.createServer(app);
 } else {
+  var options={
+    key: fs.readFileSync(process.env.SSL_KEY),
+    cert: fs.readFileSync(process.env.SSL_CERT)
+  }
+
   var server = https.createServer(options,app);
 }
 /**
