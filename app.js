@@ -99,6 +99,7 @@ passport.use(new Strategy({
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+app.set('trust proxy', 1) // trust first proxy
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -116,7 +117,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 //up express session to store sesson info in same redis database as other data for
 //this website
 app.use(expressSession({
-  cookie:{secure:false}, //use secure cookies ...server need to be running on https
+  cookie:{secure:true}, //use secure cookies ...server need to be running on https
+                        //whendeployed on heroku we run as http behind an https proxy
+                        //so need to set trust proxy settings in express to trust 1st proxy...see furher up code
   name: "sessionID", //good practice not to use default cookie name
   secret: 'si5rt2swfbcp095g', //random string i typed for securing cookie
   resave: true, ////need to check with your session store what is appropriate
