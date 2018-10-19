@@ -119,7 +119,7 @@ app.use(expressSession({
   cookie:{secure:true}, //use secure cookies ...server need to be running on https
   name: "sessionID", //good practice not to use default cookie name
   secret: 'si5rt2swfbcp095g', //random string i typed for securing cookie
-  resave: true, ////need to check with your session store what is appropriate
+  resave: false, ////need to check with your session store what is appropriate
   saveUninitialized: false,
   store:new RedisStore({client:redis.createClient(process.env.REDIS_URL)})
 }));
