@@ -116,7 +116,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 //up express session to store sesson info in same redis database as other data for
 //this website
 app.use(expressSession({
-  cookie:{secure:true}, //use secure cookies ...server need to be running on https
+  cookie:{secure:false}, //use secure cookies ...server need to be running on https
   name: "sessionID", //good practice not to use default cookie name
   secret: 'si5rt2swfbcp095g', //random string i typed for securing cookie
   resave: true, ////need to check with your session store what is appropriate
