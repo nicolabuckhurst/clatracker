@@ -33,7 +33,13 @@ var options={
   cert: fs.readFileSync(process.env.SSL_CERT)
 }
 
-var server = https.createServer(options,app);
+//when running locally need to run as self signed https or OAUTH authentication wont work
+//when deployed to heroku run as http and heroku manages https
+if(process.env.NODE_ENV == "production"){
+  var server = http.createServer(app);
+} else {
+  var server = https.createServer(options,app);
+}
 /**
  * Listen on provided port, on all network interfaces.
  */
