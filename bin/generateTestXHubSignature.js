@@ -1,10 +1,8 @@
-//run this code from commandline to generate a test x-hub-signature based on the verifySignatureTestPayload
-//store the result from this as env variable VERIFICATION_TEST_XHUBSIGNATURE
-//this will be used to test the verifySignature function, if you select to run
-//this test
+//run this code from config.txt ...this writes the required signature to terminal
+//you can execute this and write the result to the env variable in config.txt
 var crypto = require('crypto');
 
-var data = require("./verifySignatureTestPayload");
+var data = require("../test/data/verifySignatureTestPayload");
 
 //create a HMAC object with the required hash algorithm and the secret to be used
 const hmac = crypto.createHmac('sha1', process.env.WEBHOOK_SECRET_TOKEN);
