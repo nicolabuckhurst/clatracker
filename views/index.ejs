@@ -40,10 +40,13 @@
       <!--just leaving space for the footer-->
 
         <div class="content flex-grow-1">
-          <!--array of objects for details of links in navbar-->
-          <% var links = [{url:"/", label:"Home", active:true}] %>
-                    <!--{url:"#", label:"TestLink1", active:false},
-                    {url:"#",label:"TestLink2", active:false}];%>-->
+          <%if(admin == true){%>
+            <!--array of objects for details of links in navbar-->
+            <%var links = [{url:"/", label:"Home", active:true},
+                            {url:"/admin", label:"Admin", active:false}]%>
+          <%}else{%>
+            <%var links = [{url:"/", label:"Home", active:true}]%>
+          <%}%>
 
           <!--include navbar defined in navbar partial-->
           <% include partials/navbar %>

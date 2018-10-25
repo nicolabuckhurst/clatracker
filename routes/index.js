@@ -12,20 +12,25 @@ router.get('/', function(req, res, next) {
   //this page they will be rerouted back here after they have logged in
   req.session.rdUrl = "/";
 
-  //if user is logged in retrieve a liost of signed CLA's for homepage
+  //if user is logged in set admin status in session and retrieve a list of signed CLA's for homepage
   if (req.user != null){
+    //check if user is admin and if they are store this information in session
+    databaseStore.checkAdminStatus(req.user["id"])
+    .then(function(adminStatus){
+      req.session.admin=adminStatus;
+    })
     loggedIn = true;
     profilePicture = req.user["githubPicture"]
     return databaseStore.retrieveUserCLAVersions(req.user["id"])
       .then(function(claList){
           console.log(claList)
-          res.render('index', { title: 'CLA Tracker', 'loggedIn':loggedIn, 'profilePicture':profilePicture, 'claList':claList});
+          res.render('index', { title: 'CLA Tracker', 'loggedIn':loggedIn, 'profilePicture':profilePicture, 'claList':claList, 'admin':req.session.admin});
       })
   //if not logged in render a page with an empty list
   } else {
     loggedIn = false;
     profilePicture = "#"
-    res.render('index',{title: 'CLA Tracker', 'loggedIn':loggedIn, 'profilePicture':profilePicture, 'claList':claList})
+    res.render('index',{title: 'CLA Tracker', 'loggedIn':loggedIn, 'profilePicture':profilePicture, 'claList':claList, 'admin':req.session.admin})
   }
 
 });

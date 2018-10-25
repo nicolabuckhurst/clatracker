@@ -116,13 +116,13 @@ var DatabaseStore = {
 
   //check if a user has admin status
   checkAdminStatus: function(githubId){
-    let client=this.connectTodatabase(); //connect to database
+    let client=this.connectToDatabase(); //connect to database
     let key = "adminUsers"; //key of list of admin users
 
     return client.sismemberAsync(key, githubId) //returns a 1 if user is admin user or 0 if not
       .then(function(response){
         client.quit();
-        return response;
+        return !!response; //!! operator turns integar into boolean
       })
   },
 
