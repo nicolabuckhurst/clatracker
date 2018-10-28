@@ -58,6 +58,35 @@ describe("Test Database Interactions", function(){
 
   })
 
+
+  describe("Add a new admin user to database", function(){
+
+    it("adds a github id to the list of admin uses,successfully checks if user is an admin user and then deletes admin user", function(){
+      return databaseStore.addAdminUser(testGithubId)
+        .then(function(response){
+          expect(response).to.equal(1)
+          return databaseStore.addAdminUser(testGithubId)
+            .then(function(response){
+              expect(response).to.equal(0)
+              return databaseStore.checkAdminStatus(testGithubId)
+                .then(function(response){
+                  expect(response).to.equal(true)
+                  return databaseStore.deleteAdminUser(testGithubId)
+                    .then(function(response){
+                      expect(response).to.equal(1)
+                      return databaseStore.checkAdminStatus(testGithubId)
+                        .then(function(response){
+                          expect(response).to.equal(false)
+                      })
+                  })
+                })
+            })
+        })
+    })
+
+  })
+
+
   describe("Add a new CLA agreement to list of users CLAs", function(){
 
     it("adds a new version number to a set of CLAs associated with githubId", function(){

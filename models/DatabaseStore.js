@@ -98,19 +98,19 @@ var DatabaseStore = {
     return client.saddAsync(key,githubId)
       .then(function(response){
         client.quit();
-        return response;
+        return response; //integer 1 if successfully added 0 if githubID is already present and so not added again
       })
   },
 
   //remove githubId from the list of admin users
   deleteAdminUser: function(githubId){
-    let client=this.connectTodatabase(); //connect to database
+    let client=this.connectToDatabase(); //connect to database
     let key = "adminUsers"; //key of admin users
 
     return client.sremAsync(key, githubId)
       .then(function(response){
         client.quit();
-        return response;
+        return response; //integer 1 is githubID is removed, 0 if nothing is removed as githubId isnt in set
       })
   },
 

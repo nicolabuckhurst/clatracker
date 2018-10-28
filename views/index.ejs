@@ -43,7 +43,7 @@
           <%if(admin == true){%>
             <!--array of objects for details of links in navbar-->
             <%var links = [{url:"/", label:"Home", active:true},
-                            {url:"/admin", label:"Admin", active:false}]%>
+                            {url:"#", label:"Admin", active:false}]%>
           <%}else{%>
             <%var links = [{url:"/", label:"Home", active:true}]%>
           <%}%>
@@ -64,7 +64,8 @@
               <div class="col-8">
                 <ul class="list-group">
                   <% for(item in claList){ %>
-                    <li class="list-group-item"><%=claList[item]%></li>
+                    <li class="list-group-item ">
+                      <a href="#"><%=claList[item]%></a></li>
                   <%}%>
                 </ul>
               </div>

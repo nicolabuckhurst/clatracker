@@ -17,15 +17,17 @@ router.get('/', function(req, res, next) {
     //check if user is admin and if they are store this information in session
     databaseStore.checkAdminStatus(req.user["id"])
     .then(function(adminStatus){
-      req.session.admin=adminStatus;
-    })
-    loggedIn = true;
-    profilePicture = req.user["githubPicture"]
-    return databaseStore.retrieveUserCLAVersions(req.user["id"])
-      .then(function(claList){
+      let admin=adminStatus;
+
+      loggedIn = true;
+      profilePicture = req.user["githubPicture"]
+
+      return databaseStore.retrieveUserCLAVersions(req.user["id"])
+        .then(function(claList){
           console.log(claList)
-          res.render('index', { title: 'CLA Tracker', 'loggedIn':loggedIn, 'profilePicture':profilePicture, 'claList':claList, 'admin':req.session.admin});
+          res.render('index', { title: 'CLA Tracker', 'loggedIn':loggedIn, 'profilePicture':profilePicture, 'claList':claList, 'admin':admin});
       })
+    })
   //if not logged in render a page with an empty list
   } else {
     loggedIn = false;
