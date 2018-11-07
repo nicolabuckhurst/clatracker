@@ -37,3 +37,6 @@ examplePayloads
 
 #local environment config file
 config.txt
+
+#redis backup file
+dump.rdb
