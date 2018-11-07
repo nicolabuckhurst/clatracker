@@ -1,25 +1,27 @@
+// express modules
 var express = require('express');
 var router = express.Router();
 
-var expressSession = require('express-session')
-
+// modules for accessing database and calling github API
 var databaseStore = require("../models/DatabaseStore")
 var gitHubInterface = require("../models/GitHubInterface")
 
+// modules for converting markdown to html
 var showdown = require('showdown')
+var converter = new showdown.Converter()
 
-//currently hardcoded location of claContents .json file
-//this will have to be looked up using claName and a file naming convention
-var claContents = require("../CLAFiles/Apachev2.0.json")
+// currently hardcoded location of claContents .json file
+// this will have to be looked up using claName and a file naming convention
+// var claContents = require("../CLAFiles/Apachev2.0.json")
 
+// modules for reading CLA files
 var fs = require('fs');
 var path = require('path')
 
-var converter = new showdown.Converter()
-
-//this is the route which displays the CLA form to be filled in
-//the URL contains 3 parameters claName, repoName, pullRequestSha
-//repoName and pullRequestSha are needed so we can update pullrequestatus on github
+// GET ROUTE
+// displays the CLA form to be filled in
+// the URL contains 3 parameters claName, repoName, pullRequestSha
+// repoName and pullRequestSha are needed so we can update the relevant pull request status on githubs
 router.get("/:claName/:repoName/:pullRequestSha", function(req, res, next){
   let claName = req.params.claName
   let repoName = req.params.repoName
@@ -29,7 +31,7 @@ router.get("/:claName/:repoName/:pullRequestSha", function(req, res, next){
   //you need to encode any special characters in the claName,repoName and pullRequestSha
   req.session.rdUrl = "/CLA/"+encodeURIComponent(req.params.claName) + "/" + encodeURIComponent(req.params.repoName) + "/" + encodeURIComponent(req.params.pullRequestSha)
 
-  let loggedIn, profilepicture
+  let loggedIn, profilePicture
 
   if(req.user == null){
     //if user not logged in then redirect to login page
@@ -51,7 +53,7 @@ router.get("/:claName/:repoName/:pullRequestSha", function(req, res, next){
 
       //if user has signed update pull request status and alert user with message
       if(signed== true){
-        return gitHubInterface.setPullRequestStatusAsync(req.params.repoName, req.params.pullRequestSha,
+        return gitHubInterface.setPullRequestStatusAsync(repoName, pullRequestSha,
             { "state":"success",
               "description":"User has signed the relevant CLA version ( "+ claContents["name"] +" )",
               "target_url":"https://localhost:3000",
@@ -75,28 +77,29 @@ router.get("/:claName/:repoName/:pullRequestSha", function(req, res, next){
       //so we can trigger an update to the pullrequest status on github once the
       //cla is signed...so create a link that parses these parameters in url
       //encoding any special characters
-      let postURL = "/CLA/" + encodeURIComponent(req.params.claName) + "/" + encodeURIComponent(req.params.repoName) + "/" + encodeURIComponent(req.params.pullRequestSha)
+      let postURL = "/CLA/" + encodeURIComponent(claName) + "/" + encodeURIComponent(repoName) + "/" + encodeURIComponent(pullRequestSha)
+      
+      //if in test mode pick up the test CLA files otherwise pick up the development version of files...locations set in local config files
+      let claFilesPath = path.join(__dirname,'../'+process.env.CLA_FILES_PATH);
+      
+      let claContentsPath = claFilesPath+'/'+claName.replace(/\s/g,'')+'.json' //remove all whitespace from claName 
+      //Read the claContents .json file into an object asynchronously
+      fs.readFile(claContentsPath,'utf8', function(err, claContentsData){
+        let claContents = JSON.parse(claContentsData)
 
-      //we need to read in the markdown text content of the CLA
-      let claContentsParsed ={}
-      let textPath = path.join(__dirname,'/../CLAFiles/'+claContents["text"])
+        //read the text content of the CLA asynchronously as a utf8 encoded string and then pass
+        //data into callbackURL so that the markdown text gets parsed to html
+        //replace the ["text"] property in the CLAContents json with the actual html content of
+        //CLA
+        let claTextPath = claFilesPath+'/'+claContents["text"]
+        fs.readFile(claTextPath,'utf8',function(err, textData){
+          let claContentsParsed=claContents
+          claContentsParsed["text"] = converter.makeHtml(textData)
+          
 
-      //read the text content of the CLA asynchronously as a utf8 encoded string and then pass
-      //data into callbackURL so that the markdown text gets parsed to html
-      //replace the ["text"] property in the CLAContents json with the actual html content of
-      //CLA
-      return fs.readFile(textPath,'utf8',function(err, data){
-        for(property in claContents){
-          if(property == "text"){
-            claContentsParsed["text"] = converter.makeHtml(data)
-          } else {
-            claContentsParsed[property]=claContents[property]
-          }
-        }
-        //render the CLA view
-        res.render('CLA', {"title":"Sign CLA", "loggedIn":loggedIn, "profilePicture":profilePicture, "claContents":claContentsParsed, "postURL":postURL})
+          res.render('CLA', {"title":"Sign CLA", "loggedIn":loggedIn, "profilePicture":profilePicture, "claContents":claContentsParsed, "postURL":postURL})
+        })
       })
-
     })
 })
 

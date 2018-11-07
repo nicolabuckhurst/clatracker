@@ -1,0 +1,14 @@
+{
+  "name":"Apache 2.0",
+  "text":"Apachev2.0.md",
+  "optional fields": {
+    "organisation name":"text",
+    "title":""
+  },
+  "required fields":{
+    "full name":"textarea",
+    "date":"date",
+    "email":"email",
+    "address":"textarea"
+  }
+}
