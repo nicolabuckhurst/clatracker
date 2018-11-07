@@ -10,15 +10,11 @@ var gitHubInterface = require("../models/GitHubInterface")
 var showdown = require('showdown')
 var converter = new showdown.Converter()
 
-// currently hardcoded location of claContents .json file
-// this will have to be looked up using claName and a file naming convention
-// var claContents = require("../CLAFiles/Apachev2.0.json")
-
 // modules for reading CLA files
 var fs = require('fs');
 var path = require('path')
 
-// GET ROUTE
+// ******* GET ROUTE **********
 // displays the CLA form to be filled in
 // the URL contains 3 parameters claName, repoName, pullRequestSha
 // repoName and pullRequestSha are needed so we can update the relevant pull request status on githubs
@@ -26,12 +22,11 @@ router.get("/:claName/:repoName/:pullRequestSha", function(req, res, next){
   let claName = req.params.claName
   let repoName = req.params.repoName
   let pullRequestSha = req.params.pullRequestSha
+  let loggedIn, profilePicture
 
   //url to redirect back to if user is redirected to login from here
   //you need to encode any special characters in the claName,repoName and pullRequestSha
   req.session.rdUrl = "/CLA/"+encodeURIComponent(req.params.claName) + "/" + encodeURIComponent(req.params.repoName) + "/" + encodeURIComponent(req.params.pullRequestSha)
-
-  let loggedIn, profilePicture
 
   if(req.user == null){
     //if user not logged in then redirect to login page
@@ -40,7 +35,7 @@ router.get("/:claName/:repoName/:pullRequestSha", function(req, res, next){
     res.redirect('/login/github')
   }
 
-  //if user is alread logged in, set logged in to true and profilepicture so that navbar displays correctly
+  //user is alread logged in, set logged in to true and profilepicture so that navbar displays correctly
   loggedIn = true;
   profilePicture = req.user["githubPicture"]
 
