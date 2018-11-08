@@ -98,25 +98,32 @@ router.get("/:claName/:repoName/:pullRequestSha", function(req, res, next){
     })
 })
 
+//********* POST ROUTE ******************/
 //route to post data from form to...pass the claname, reponame and pullRequestSha as url Parameters
 router.post("/:claName/:repoName/:pullRequestSha", function(req, res, next){
-  return databaseStore.storeSignedCLADetailsAsync(req.user.id, req.params.claName, req.body)
+  let userId = req.user.id;
+  let repoName = req.params.repoName
+  let claName = req.params.claName
+  let pullRequestSha = req.params.pullRequestSha
+  let formData = req.body
+
+  return databaseStore.storeSignedCLADetailsAsync(userId, claName, formData)
     .then(function(responses){
-      return gitHubInterface.setPullRequestStatusAsync(req.params.repoName, req.params.pullRequestSha,
+      return gitHubInterface.setPullRequestStatusAsync(repoName, pullRequestSha,
           { "state":"success",
-            "description":"User has signed the relevant CLA version ( "+ claContents["name"] +" )",
+            "description":"User has signed the relevant CLA version ( "+ claName +" )",
             "target_url":"https://localhost:3000",
             "context":"CLATracker"
           },
           process.env.GITHUB_PERSONAL_ACCESS_TOKEN)
-        .then(function(response){
-          if(response == "status set"){
-            //redirect to homepage
-            res.redirect("/")
-          }else{
-            res.render('alert',{message:"you have signed the CLA but there was a problem updating the pullRequestStatus on github. Please resubmit your pull request"})
-          }
         })
+    .then(function(response){
+      if(response == "status set"){
+        //redirect to homepage
+        res.redirect("/")
+      }else{
+        res.render('alert',{message:"you have signed the CLA but there was a problem updating the pullRequestStatus on github. Please resubmit your pull request"})
+      }
     })
 })
 
