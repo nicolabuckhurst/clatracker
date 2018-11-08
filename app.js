@@ -121,7 +121,7 @@ app.use(expressSession({
                         //whendeployed on heroku we run as http behind an https proxy
                         //so need to set trust proxy settings in express to trust 1st proxy...see furher up code
   name: "sessionID", //good practice not to use default cookie name
-  secret: 'si5rt2swfbcp095g', //random string i typed for securing cookie
+  secret: process.env.SESSION_SECRET, //random string i typed for securing cookie
   resave: true, ////need to check with your session store what is appropriate
   saveUninitialized: false,
   store:new RedisStore({client:redis.createClient(process.env.REDIS_URL)})
