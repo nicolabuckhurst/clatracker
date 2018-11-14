@@ -1,5 +1,3 @@
-var chai = require("chai");
-
 var expect = require("chai").expect;
 
 var githubInterface = require("../models/GitHubInterface")
