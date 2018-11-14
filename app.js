@@ -101,6 +101,7 @@ githubStrategy = new Strategy({
       })
   });
 
+  //make the test login strategy is only available when running in test mode and so also accessing test database 
   switch (process.env.NODE_ENV){
     case "test":
       console.log("using testStrategy")

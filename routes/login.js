@@ -24,4 +24,10 @@ router.get('/logout', function(req, res, next){
   res.redirect('/'); //redirect back to homepage
 });
 
+//route that is called to login the test user ...used for testing only
+//if this route is called in non test mode the 'local' passport strategy won't be found
+router.post('/testlogin', passport.authenticate('local',{failureRedirect:"#"}), function(req,res,next){
+  res.send();
+})
+
 module.exports = router;
