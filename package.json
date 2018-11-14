@@ -3,11 +3,11 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start":"node ./bin/www", 
+    "start": "node ./bin/www",
     "startlocal": ". ../clatrackerCONFIG/config_base.txt && . ../clatrackerCONFIG/config_dev.txt && nodemon ./bin/www",
     "test": ". ../clatrackerCONFIG/config_base.txt && . ../clatrackerCONFIG/config_test.txt && mocha test --exit",
     "admin": ". ../clatrackerCONFIG/config_base.txt && . ../clatrackerCONFIG/config_dev.txt && node ./bin/admin",
-    "CLA":". ../clatrackerCONFIG/config_base.txt && . ../clatrackerCONFIG/config_dev.txt && node ./bin/CLA"
+    "CLA": ". ../clatrackerCONFIG/config_base.txt && . ../clatrackerCONFIG/config_dev.txt && node ./bin/CLA"
   },
   "dependencies": {
     "bluebird": "^3.5.1",
@@ -22,6 +22,7 @@
     "node-fetch": "^2.1.2",
     "passport": "^0.4.0",
     "passport-github2": "^0.1.11",
+    "passport-local": "^1.0.0",
     "path": "^0.12.7",
     "redis": "^2.8.0",
     "serve-favicon": "~2.4.5",
