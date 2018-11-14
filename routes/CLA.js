@@ -22,6 +22,7 @@ router.get("/:claName/:repoName/:pullRequestSha", function(req, res, next){
   let claName = req.params.claName
   let repoName = req.params.repoName
   let pullRequestSha = req.params.pullRequestSha
+  let userId
   let loggedIn, profilePicture
 
   //url to redirect back to if user is redirected to login from here
@@ -32,25 +33,27 @@ router.get("/:claName/:repoName/:pullRequestSha", function(req, res, next){
     //if user not logged in then redirect to login page
     loggedIn = false;
     profilePicture = "#";
+    userId = null
     res.redirect('/login/github')
   }
-
+  
   //user is alread logged in, set logged in to true and profilepicture so that navbar displays correctly
   loggedIn = true;
   profilePicture = req.user["githubPicture"]
+  userId = req.user["id"]
 
 
   //check if user has already signed the CLA --- it is possible that the user has
   //signed this CLA since pull request was made generating a link to this page....
   //so check for signing again here
-  return databaseStore.checkCLASignedAsync(req.user["id"],req.params.claName)
+  return databaseStore.checkCLASignedAsync(userId,claName)
     .then(function(signed){
-
+      console.log(signed)
       //if user has signed update pull request status and alert user with message
       if(signed== true){
         return gitHubInterface.setPullRequestStatusAsync(repoName, pullRequestSha,
             { "state":"success",
-              "description":"User has signed the relevant CLA version ( "+ claContents["name"] +" )",
+              "description":"User has signed the relevant CLA version ( "+ claName +" )",
               "target_url":"https://localhost:3000",
               "context":"CLATracker"
             },
