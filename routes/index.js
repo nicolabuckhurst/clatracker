@@ -33,7 +33,7 @@ router.get('/', function(req, res, next) {
   } else {
     loggedIn = false;
     profilePicture = "#"
-    res.render('index',{title: 'CLA Tracker', 'loggedIn':loggedIn, 'profilePicture':profilePicture, 'claList':claList, 'admin':req.session.admin})
+    res.render('index',{title: 'CLA Tracker', 'loggedIn':loggedIn, 'profilePicture':profilePicture, 'claList':claList, 'admin':admin})
   }
 
 });

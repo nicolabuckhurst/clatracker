@@ -48,7 +48,6 @@ router.get("/:claName/:repoName/:pullRequestSha", function(req, res, next){
   //so check for signing again here
   return databaseStore.checkCLASignedAsync(userId,claName)
     .then(function(signed){
-      console.log(signed)
       //if user has signed update pull request status and alert user with message
       if(signed== true){
         return gitHubInterface.setPullRequestStatusAsync(repoName, pullRequestSha,
@@ -58,18 +57,18 @@ router.get("/:claName/:repoName/:pullRequestSha", function(req, res, next){
               "context":"CLATracker"
             },
             process.env.GITHUB_PERSONAL_ACCESS_TOKEN)
-          .then(function(response){
-            if(response == "status set"){
-              //render a page that informs user they have already signed the CLA
-              res.render('alert',{"title":"Alert", "loggedIn":loggedIn, "profilePicture":profilePicture, message:"You have already signed the relevant CLA since submitting your pull request, the pull request status on Github has now been updated"})
-            }else{
-              res.render('alert',{"title":"Alert", "loggedIn":loggedIn, "profilePicture":profilePicture, message:"You have already signed the relevant CLA since submitting your pull request, however there was a problem updating the pull request status on Github. Please resubmit your pull request"})
-            }
-          })
+        .then(function(response){
+          if(response == "status set"){
+            //render a page that informs user they have already signed the CLA
+            res.render('alert',{"title":"Alert", "loggedIn":loggedIn, "profilePicture":profilePicture, message:"You have already signed the relevant CLA since submitting your pull request, the pull request status on Github has now been updated"})
+          }else{
+            res.render('alert',{"title":"Alert", "loggedIn":loggedIn, "profilePicture":profilePicture, message:"You have already signed the relevant CLA since submitting your pull request, however there was a problem updating the pull request status on Github. Please resubmit your pull request"})
+          }
+        })
       }
 
       //if user hasn't signed go ahead and generate a cla form to fill in
-
+      
       //when we post the CLA form back to server we want to keep track of
       //claName and the repoName and pull requestsha from this route Parameters
       //so we can trigger an update to the pullrequest status on github once the

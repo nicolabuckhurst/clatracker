@@ -35,7 +35,6 @@ var app = express();
 testStrategy = new LocalStrategy(
   function(username, password, done){ //expects a username and password arg as usualluy used for local authentication..in this case we don't
                                       //actually check password or usernames we just automatically authenticate the test useer
-    console.log("test Strategy called")
     var user = {}
     var testData = require("./test/data/testPayloadContributor")
     user.login="testUser"

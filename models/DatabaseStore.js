@@ -8,8 +8,8 @@ var bluebird = require('bluebird');
 bluebird.promisifyAll(redis);
 
 //Data is stored in database as follows:
-//A users github profile details are stored by key user:githubId
-//A list of clas signed by a user are stored in a Set by key CLAList:githubId ..sets don't allow repeated members...so if a CLA is signed more than once it will only appear once in set
+//a users github profile details are stored by key user:githubId
+//a list of clas signed by a user are stored in a Set by key CLAList:githubId ..sets don't allow repeated members...so if a CLA is signed more than once it will only appear once in set
 //CLARequirements are stored against a key CLARequirements as a hash repositoryname:cla version
 //User details for a particular CLA  are stored against a key CLA:claversion:githubId (these could be different to github profile info)
 //The CLA content is stored as hash against key CLA:claversion
