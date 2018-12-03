@@ -26,8 +26,7 @@ router.get("/:claName/:repoName/:pullRequestSha", function(req, res, next){
   let loggedIn, profilePicture
 
   //url to redirect back to if user is redirected to login from here
-  //you need to encode any special characters in the claName,repoName and pullRequestSha
-  req.session.rdUrl = "/CLA/"+encodeURIComponent(req.params.claName) + "/" + encodeURIComponent(req.params.repoName) + "/" + encodeURIComponent(req.params.pullRequestSha)
+  req.session.rdUrl = req.originalUrl;
 
   if(req.user == null){
     //if user not logged in then redirect to login page
