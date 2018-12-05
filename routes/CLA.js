@@ -21,11 +21,11 @@ var path = require('path')
 // repoName and pullRequestSha are needed so we can update the relevant pull request status on githubs
 router.get("/:claName/:repoName/:pullRequestSha", function(req, res, next){ 
   
-  //if user is not logged in reroute to login and return
+  //if user is not logged in reroute to login and return immediately
   if(req.user==null){
     res.redirect('/login/github');
     return
-   }
+  }
 
   //if user is logged in
   let claName = req.params.claName;
