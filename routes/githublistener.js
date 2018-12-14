@@ -79,7 +79,7 @@ router.post('/', function(req,res,next){
         console.log("user has signed relevant CLA")
         state = "success"
         description = "User has signed the relevant CLA version ( "+ requiredCLA +" )"
-        target_url = "https://localhost:3000"
+        target_url = req.hostname
         success_code = 201
         success_message = "User has signed relevant CLA"
       break;
@@ -89,7 +89,7 @@ router.post('/', function(req,res,next){
         console.log("user has NOT signed relevant CLA")
         state = "failure"
         description = "User must sign CLA "+ requiredCLA + " before this pull request can be merged"
-        target_url = "https://localhost:3000/CLA/" + encodeURIComponent(requiredCLA) + "/" + encodeURIComponent(payload["repoName"]) + "/" + encodeURIComponent(payload["pullRequestSha"]),
+        target_url = req.hostname + "/CLA/" + encodeURIComponent(requiredCLA) + "/" + encodeURIComponent(payload["repoName"]) + "/" + encodeURIComponent(payload["pullRequestSha"]),
         success_code = 202
         success_message = "user has NOT signed relevant CLA"
       break;
@@ -99,7 +99,7 @@ router.post('/', function(req,res,next){
         console.log("CLA not required")
         state = "success"
         description = "No CLA required"
-        target_url = "https://localhost:3000"
+        target_url = req.hostname
         success_code = 203
         success_message = "CLA Not Required"
       break;
