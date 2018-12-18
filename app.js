@@ -82,7 +82,6 @@ githubStrategy = new Strategy({
         //database and then return that user object --if user is already
         //in database then storeUserDetailsAsync will update the data in the
         //database
-        console.log(profile)
         user.login = profile.username;
         user.id = profile.id;
         user.githubPicture = profile.photos[0]["value"];
@@ -95,7 +94,6 @@ githubStrategy = new Strategy({
       // then finally when all the previous promises have resolved call done(null, user)
       // to make passport put the user into the req.object
       .then(function(user){
-        console.log('user object returned from database:'+JSON.stringify(user))
         return done(null, user);
       })
   });

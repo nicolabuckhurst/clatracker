@@ -39,6 +39,8 @@ describe("**CLA Form tests**  (routes called with valid claname, reponame and pu
             .then(function(res){
                 sinon.spy(response,"render") //set spies on functions
                 sinon.spy(githubInterface,"setPullRequestStatusAsync")
+                sinon.spy(databaseStore, "storeSignedCLADetailsAsync")
+                sinon.spy(response,"redirect")
              })
              .catch(function(err){
                  throw err;
@@ -70,9 +72,7 @@ describe("**CLA Form tests**  (routes called with valid claname, reponame and pu
     describe("2. User has not signed CLA since URL for form was generated", function(){
         before("add database data", function(){
             var promises=[]
-                //promises.push(databaseStore.storeUserDetailsAsync(testUserId, testUserDetails)) //store test data in test database
                 promises.push(databaseStore.storeCLARequirementsAsync(testRepoName, testCLAName))
-                //promises.push(databaseStore.storeSignedCLADetailsAsync(testUserId, testCLAName, testCLAUserDetails))
                 return Promise.all(promises)
         })
 
@@ -89,12 +89,48 @@ describe("**CLA Form tests**  (routes called with valid claname, reponame and pu
         })
     })
 
+    describe("3. User successfully submits form data", function(){
+        it("should store form data to database, pull request status updated and then redirect to homepage", function(){
+            return agent.post('/CLA/'+encodeURIComponent(testCLAName)+'/'+encodeURIComponent(testRepoName)+'/'+encodeURIComponent(testPullRequestSha))
+                .type('form')
+                .send({name:"name", email:"test@test.com"})
+            .then(function(res){
+                expect(res.status).to.equal(200)
+                expect(databaseStore.storeSignedCLADetailsAsync).to.have.been.called
+                expect(githubInterface.setPullRequestStatusAsync).to.have.been.called
+                expect(response.redirect).to.have.been.calledWithMatch('/')
+            })
+            .catch(function(err){
+                throw err;
+            })
+        })
+    })
+
+    describe("4. User submits a form but pull request status can't be updated", function(){
+        it("should store form data to database, try to set pull request status and then render an alert", function(){
+            return agent.post('/CLA/'+encodeURIComponent(testCLAName)+'/'+encodeURIComponent(testRepoName)+'/'+'123')
+                .type('form')
+                .send({name:"name", email:"test@test.com"})
+            .then(function(res){
+                expect(res.status).to.equal(200)
+                expect(databaseStore.storeSignedCLADetailsAsync).to.have.been.called
+                expect(githubInterface.setPullRequestStatusAsync).to.have.been.called
+                expect(response.render).to.have.been.calledWithMatch('alert')
+            })
+            .catch(function(err){
+                throw err;
+            })   
+        })
+    })
 
     afterEach("remove all spies and close agent", function(){
         databaseStore.resetDatabaseAsync()
         githubInterface.setPullRequestStatusAsync.restore()
+        databaseStore.storeSignedCLADetailsAsync.restore()
         response.render.restore()
+        response.redirect.restore()
         agent.close() //the server started by agent wont automatically close when tests finish so make sure you close it here
                           //not doing this can lead to bugs
     })
 })
+
