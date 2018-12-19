@@ -48,11 +48,11 @@ router.post('/', function(req,res,next){
   console.log("payload:" + JSON.stringify(payload))
 
   //check that author is NOT a member of org 
-  let isAuthorNonMemberCheck = checkisAuthorNonMember(payload);
-  if(isAuthorNonMemberCheck["status"]=="failed"){
-    res.status(200).send(isAuthorNonMemberCheck["message"]); //send a 200 as this is not an error but we don't need to do anything is author is member
+  if (checkisAuthorNonMember(payload) == false){
+    res.status(200).send("author is a member of organisation, CLA not required"); //send a 200 as this is not an error but we don't need to do anything is author is member
     return //immediately return
   }
+
   console.log("author non member")
 
 
@@ -194,11 +194,13 @@ function simplifyPayload(req) {
 
 //check that author of pull request is NOT a member if organisation that owns repository
 function checkisAuthorNonMember(payloadData){
+  let isNonMember
   if(payloadData["authorAssociation"]=="MEMBER"){
-    return {status:"failed", message:"author is member of organisation"}
+    isNonMember = false
   } else {
-    return {status:"passed"}
+    isNonMember = true
   }
+  return isNonMember
 }
 
 
