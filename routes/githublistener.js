@@ -13,11 +13,14 @@ var Promise = require("bluebird")
 router.post('/', function(req,res,next){
 
   //check payload haeaders
-  let payloadHeaderCheck = checkPayloadHeaders(req)
-  if(payloadHeaderCheck["status"] == "failed"){
-    res.status(500).send(payloadHeaderCheck["message"]);
-    return //immediately return
+  try {
+    checkPayloadHeaders(req)
   }
+  catch(e) {
+    res.status(500).send(payloadHeaderCheck["message"]);
+    throw e
+  }
+  
   console.log("headers ok")
 
   //check payload hasn't been tampered with
@@ -133,18 +136,18 @@ router.post('/', function(req,res,next){
 
 /***SUB FUNCTIONS*************/
 
-//function that checks that payload is valid --if any of the checks fail immediately return with status failed and apporiate message.
+//function that checks that payload is valid --if any of the checks fail throw error with apporiate message.
 function checkPayloadHeaders(req) {
   //fail if payload has no webhook secret set
   if(req.get('X-Hub-Signature')==undefined){
-    return {status:"failed",message:"please configure secret for the webhook on this repository"}
+    throw("please configure secret for the webhook on this repository")
   }
   //fail if payload has data in non JSON format as verify Signature function won't work
   if(req.get('content-type')!='application/json'){
-    return {status:"failed",message:"please configure webhook to send data as application/json"}
+    throw ("please configure webhook to send data as application/json")
   }
   //otherwise return passed
-  return {status:"passed"}
+  return true
 }
 
 //function that verifies payload against X-Hub_signature header
