@@ -32,18 +32,19 @@ router.post('/', function(req,res,next){
       throw e
     }
   }
-  
+
   console.log("signature ok")
 
-  //take raw payload and check data and then simplify to include just what we need
-  let payloadDataCheck = checkPayloadData(req);
-  if(payloadDataCheck["status"] == "failed"){
-    res.status(500).send(payloadDataCheck["message"]);
-    return //immediately return
-  }
+  let payload;
 
-  //if payload data is all present set payload variable to our new simplified payload object
-  let payload = payloadDataCheck["data"]
+  try{
+    payload = simplifyPayload(req);
+  }
+  catch(e){
+    res.status(500).send(e);
+    throw e
+  }
+ 
   console.log("payload:" + JSON.stringify(payload))
 
   //check that author is NOT a member of org 
@@ -169,21 +170,26 @@ function verifyXHubSignature(req){
 }
 
 //function that checks and simplifies payloadData
-function checkPayloadData(req) {
+function simplifyPayload(req) {
   let payloadData ={};
-  payloadData["login"]=req.body["pull_request"]["user"]["login"];
-  payloadData["id"] =req.body["pull_request"]["user"]["id"];
-  payloadData["authorAssociation"]=req.body["pull_request"]["author_association"];
-  payloadData["repoName"] = req.body["repository"]["full_name"];
-  payloadData["pullRequestSha"] = req.body["pull_request"]["head"]["sha"];
-
-  //check all the required data fields are present
-  for(var property in payloadData){
-    if(payloadData[property]==undefined){
-      return {status:"failed", message:property + " field not present in payload"};
+  try{
+    payloadData["login"]=req.body["pull_request"]["user"]["login"];
+    payloadData["id"] =req.body["pull_request"]["user"]["id"];
+    payloadData["authorAssociation"]=req.body["pull_request"]["author_association"];
+    payloadData["repoName"] = req.body["repository"]["full_name"];
+    payloadData["pullRequestSha"] = req.body["pull_request"]["head"]["sha"];
+  
+    //check all the required data fields are present
+    for(var property in payloadData){
+      if(payloadData[property]==undefined || payloadData[property]==null){
+        throw property + " field not present in payload";
+      }
     }
   }
-  return {status:"passed",data:payloadData};
+  catch(e){
+    throw e
+  }
+  return payloadData;
 }
 
 //check that author of pull request is NOT a member if organisation that owns repository
