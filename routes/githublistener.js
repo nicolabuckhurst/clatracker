@@ -17,18 +17,22 @@ router.post('/', function(req,res,next){
     checkPayloadHeaders(req)
   }
   catch(e) {
-    res.status(500).send(payloadHeaderCheck["message"]);
+    res.status(500).send(e);
     throw e
   }
   
   console.log("headers ok")
-
-  //check payload hasn't been tampered with
-  let xhubSignatureCheck = verifyXHubSignature(req)
-  if(xhubSignatureCheck["status"] == "failed"){
-    res.status(500).send(xhubSignatureCheck["message"]);
-    return //immediately return
+  
+  if(process.env.NODE_ENV!="test"){
+    try{
+      verifyXHubSignature(req)
+    }
+    catch(e){
+      res.status(500).send(e);
+      throw e
+    }
   }
+  
   console.log("signature ok")
 
   //take raw payload and check data and then simplify to include just what we need
@@ -146,22 +150,22 @@ function checkPayloadHeaders(req) {
   if(req.get('content-type')!='application/json'){
     throw ("please configure webhook to send data as application/json")
   }
-  //otherwise return passed
+  //otherwise return true
   return true
 }
 
 //function that verifies payload against X-Hub_signature header
 function verifyXHubSignature(req){
   //in test mode don't bother verifying against X-Hub_Signature - verifySignature funtion is tested seperately
-  if(process.env.NODE_ENV=="test"){
-    return {status:"passed", message:"don't verify against signature in test mode"}
-  } 
+  //if(process.env.NODE_ENV=="test"){
+    //return {status:"passed", message:"don't verify against signature in test mode"}
+  //} 
   //fail if can't verify signature
   if(verifySignature(req.body, req.get('X-Hub-Signature'))==false) {
-    return {status:"failed", message:"could not confirm payload was from github check content type is set to application/JSON in webhook"}
+    throw "could not confirm payload was from github check content type is set to application/JSON in webhook"
   }
   //otherwise return passed
-  return {status:"passed"}
+  return true
 }
 
 //function that checks and simplifies payloadData
