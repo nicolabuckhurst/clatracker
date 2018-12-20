@@ -11,41 +11,20 @@ var Promise = require("bluebird")
 /***WEBHOOK ROUTE*************/
 //this route is called when github sends a payload via webhook
 router.post('/', function(req,res,next){
-
-  //check payload haeaders
+  let payload;
+  
+  //check payload haeaders, verify xhubsignature, simplify payload
   try {
     checkPayloadHeaders(req)
+    if(process.env.NODE_ENV != "test"){
+      verifyXHubSignature(req)
+    }
+    payload = simplifyPayload(req)
   }
   catch(e) {
     res.status(500).send(e);
     throw e
   }
-  
-  console.log("headers ok")
-  
-  if(process.env.NODE_ENV!="test"){
-    try{
-      verifyXHubSignature(req)
-    }
-    catch(e){
-      res.status(500).send(e);
-      throw e
-    }
-  }
-
-  console.log("signature ok")
-
-  let payload;
-
-  try{
-    payload = simplifyPayload(req);
-  }
-  catch(e){
-    res.status(500).send(e);
-    throw e
-  }
- 
-  console.log("payload:" + JSON.stringify(payload))
 
   //check that author is NOT a member of org 
   if (checkisAuthorNonMember(payload) == false){
