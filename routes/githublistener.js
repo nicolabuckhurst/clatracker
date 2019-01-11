@@ -11,45 +11,7 @@ var Promise = require("bluebird")
 /***WEBHOOK ROUTE*************/
 //this route is called when github sends a payload via webhook
 router.post('/', function(req,res,next){
-
-  //check payload haeaders
-  let payloadHeaderCheck = checkPayloadHeaders(req)
-  if(payloadHeaderCheck["status"] == "failed"){
-    res.status(500).send(payloadHeaderCheck["message"]);
-    return //immediately return
-  }
-  console.log("headers ok")
-
-  //check payload hasn't been tampered with
-  let xhubSignatureCheck = verifyXHubSignature(req)
-  if(xhubSignatureCheck["status"] == "failed"){
-    res.status(500).send(xhubSignatureCheck["message"]);
-    return //immediately return
-  }
-  console.log("signature ok")
-
-  //take raw payload and check data and then simplify to include just what we need
-  let payloadDataCheck = checkPayloadData(req);
-  if(payloadDataCheck["status"] == "failed"){
-    res.status(500).send(payloadDataCheck["message"]);
-    return //immediately return
-  }
-
-  //if payload data is all present set payload variable to our new simplified payload object
-  let payload = payloadDataCheck["data"]
-  console.log("payload:" + JSON.stringify(payload))
-
-  //check that author is NOT a member of org 
-  let isAuthorNonMemberCheck = checkisAuthorNonMember(payload);
-  if(isAuthorNonMemberCheck["status"]=="failed"){
-    res.status(200).send(isAuthorNonMemberCheck["message"]); //send a 200 as this is not an error but we don't need to do anything is author is member
-    return //immediately return
-  }
-  console.log("author non member")
-
-
-  //return a promise to retrieve the CLARequirements from Database
-  let requiredCLAPromise = databaseStore.retrieveCLARequirementsAsync(payload["repoName"]) //declare this promise here so its resolved vale is accessable further down promise chain
+  let payload;
   let state
   let description
   let target_url
@@ -58,6 +20,31 @@ router.post('/', function(req,res,next){
   let success_message
   let fail_code = 500
   let fail_message = "something went wrong setting pull request status"
+  
+  //check payload haeaders, verify xhubsignature, simplify payload
+  try {
+    checkPayloadHeaders(req)
+
+    if(process.env.NODE_ENV != "test"){
+      verifyXHubSignature(req)
+    }
+
+    payload = simplifyPayload(req)
+
+    if (checkisAuthorNonMember(payload) == false){
+      res.status(200).send("author is a member of organisation, CLA not required"); //send a 200 as this is not an error but we don't need to do anything is author is member
+      return //immediately return
+    }
+
+  }
+  catch(e) {
+    res.status(500).send(e);
+    throw e
+  }
+
+
+  //return a promise to retrieve the CLARequirements from Database
+  let requiredCLAPromise = databaseStore.retrieveCLARequirementsAsync(payload["repoName"]) //declare this promise here so its resolved value is accessable further down promise chain
   
   return requiredCLAPromise
   //then check to see if user has signed required CLA
@@ -75,11 +62,14 @@ router.post('/', function(req,res,next){
       
     switch(signed){
       //if user has signed send a success response and send 201 response
+      //should be able to use req.HOSTNAME to get hostname of originating request biut there is a bug in v4 express that 
+      //doesn't return port number so this doesn't work when running app on localhost:3000. So just used an env variable to store
+      //hostname ...this needs to be set when deployed
       case true:
         console.log("user has signed relevant CLA")
         state = "success"
         description = "User has signed the relevant CLA version ( "+ requiredCLA +" )"
-        target_url = req.hostname
+        target_url = process.env.HOSTNAME
         success_code = 201
         success_message = "User has signed relevant CLA"
       break;
@@ -89,7 +79,7 @@ router.post('/', function(req,res,next){
         console.log("user has NOT signed relevant CLA")
         state = "failure"
         description = "User must sign CLA "+ requiredCLA + " before this pull request can be merged"
-        target_url = req.hostname + "/CLA/" + encodeURIComponent(requiredCLA) + "/" + encodeURIComponent(payload["repoName"]) + "/" + encodeURIComponent(payload["pullRequestSha"]),
+        target_url = process.env.HOSTNAME + "/CLA/" + encodeURIComponent(requiredCLA) + "/" + encodeURIComponent(payload["repoName"]) + "/" + encodeURIComponent(payload["pullRequestSha"]),
         success_code = 202
         success_message = "user has NOT signed relevant CLA"
       break;
@@ -99,7 +89,7 @@ router.post('/', function(req,res,next){
         console.log("CLA not required")
         state = "success"
         description = "No CLA required"
-        target_url = req.hostname
+        target_url = process.env.HOSTNAME
         success_code = 203
         success_message = "CLA Not Required"
       break;
@@ -130,58 +120,70 @@ router.post('/', function(req,res,next){
 
 /***SUB FUNCTIONS*************/
 
-//function that checks that payload is valid --if any of the checks fail immediately return with status failed and apporiate message.
+//function that checks that payload is valid --if any of the checks fail throw error with apporiate message.
 function checkPayloadHeaders(req) {
   //fail if payload has no webhook secret set
   if(req.get('X-Hub-Signature')==undefined){
-    return {status:"failed",message:"please configure secret for the webhook on this repository"}
+    throw("please configure secret for the webhook on this repository")
   }
   //fail if payload has data in non JSON format as verify Signature function won't work
   if(req.get('content-type')!='application/json'){
-    return {status:"failed",message:"please configure webhook to send data as application/json"}
+    throw ("please configure webhook to send data as application/json")
   }
-  //otherwise return passed
-  return {status:"passed"}
+  //otherwise return true
+  return true
 }
 
 //function that verifies payload against X-Hub_signature header
 function verifyXHubSignature(req){
   //in test mode don't bother verifying against X-Hub_Signature - verifySignature funtion is tested seperately
-  if(process.env.NODE_ENV=="test"){
-    return {status:"passed", message:"don't verify against signature in test mode"}
-  } 
+  //if(process.env.NODE_ENV=="test"){
+    //return {status:"passed", message:"don't verify against signature in test mode"}
+  //} 
   //fail if can't verify signature
   if(verifySignature(req.body, req.get('X-Hub-Signature'))==false) {
-    return {status:"failed", message:"could not confirm payload was from github check content type is set to application/JSON in webhook"}
+    throw "could not confirm payload was from github check content type is set to application/JSON in webhook"
   }
   //otherwise return passed
-  return {status:"passed"}
+  return true
 }
 
 //function that checks and simplifies payloadData
-function checkPayloadData(req) {
+function simplifyPayload(req) {
   let payloadData ={};
-  payloadData["login"]=req.body["pull_request"]["user"]["login"];
-  payloadData["id"] =req.body["pull_request"]["user"]["id"];
-  payloadData["authorAssociation"]=req.body["pull_request"]["author_association"];
-  payloadData["repoName"] = req.body["repository"]["full_name"];
-  payloadData["pullRequestSha"] = req.body["pull_request"]["head"]["sha"];
-
-  //check all the required data fields are present
-  for(var property in payloadData){
-    if(payloadData[property]==undefined){
-      return {status:"failed", message:property + " field not present in payload"};
+  try{
+    payloadData["login"]=req.body["pull_request"]["user"]["login"];
+    payloadData["id"] =req.body["pull_request"]["user"]["id"];
+    payloadData["authorAssociation"]=req.body["pull_request"]["author_association"];
+    payloadData["repoName"] = req.body["repository"]["full_name"];
+    payloadData["pullRequestSha"] = req.body["pull_request"]["head"]["sha"];
+  
+    //check all the required data fields are present
+    for(var property in payloadData){
+      if(payloadData[property]==undefined || payloadData[property]==null){
+        throw property + " field not present in payload";
+      }
     }
   }
-  return {status:"passed",data:payloadData};
+  catch(e){
+    throw e
+  }
+  return payloadData;
 }
 
 //check that author of pull request is NOT a member if organisation that owns repository
 function checkisAuthorNonMember(payloadData){
-  if(payloadData["authorAssociation"]=="MEMBER"){
-    return {status:"failed", message:"author is member of organisation"}
-  } else {
-    return {status:"passed"}
+  try {
+    let isNonMember
+    if(payloadData["authorAssociation"]=="MEMBER"){
+      isNonMember = false
+    } else {
+      isNonMember = true
+    }
+    return isNonMember
+  }
+  catch(e){
+    throw "there was a problem checking whether author is a Member" + e
   }
 }
 
