@@ -12,31 +12,6 @@ var Promise = require("bluebird")
 //this route is called when github sends a payload via webhook
 router.post('/', function(req,res,next){
   let payload;
-  
-  //check payload haeaders, verify xhubsignature, simplify payload
-  try {
-    checkPayloadHeaders(req)
-    if(process.env.NODE_ENV != "test"){
-      verifyXHubSignature(req)
-    }
-    payload = simplifyPayload(req)
-  }
-  catch(e) {
-    res.status(500).send(e);
-    throw e
-  }
-
-  //check that author is NOT a member of org 
-  if (checkisAuthorNonMember(payload) == false){
-    res.status(200).send("author is a member of organisation, CLA not required"); //send a 200 as this is not an error but we don't need to do anything is author is member
-    return //immediately return
-  }
-
-  console.log("author non member")
-
-
-  //return a promise to retrieve the CLARequirements from Database
-  let requiredCLAPromise = databaseStore.retrieveCLARequirementsAsync(payload["repoName"]) //declare this promise here so its resolved vale is accessable further down promise chain
   let state
   let description
   let target_url
@@ -45,6 +20,31 @@ router.post('/', function(req,res,next){
   let success_message
   let fail_code = 500
   let fail_message = "something went wrong setting pull request status"
+  
+  //check payload haeaders, verify xhubsignature, simplify payload
+  try {
+    checkPayloadHeaders(req)
+
+    if(process.env.NODE_ENV != "test"){
+      verifyXHubSignature(req)
+    }
+
+    payload = simplifyPayload(req)
+
+    if (checkisAuthorNonMember(payload) == false){
+      res.status(200).send("author is a member of organisation, CLA not required"); //send a 200 as this is not an error but we don't need to do anything is author is member
+      return //immediately return
+    }
+
+  }
+  catch(e) {
+    res.status(500).send(e);
+    throw e
+  }
+
+
+  //return a promise to retrieve the CLARequirements from Database
+  let requiredCLAPromise = databaseStore.retrieveCLARequirementsAsync(payload["repoName"]) //declare this promise here so its resolved value is accessable further down promise chain
   
   return requiredCLAPromise
   //then check to see if user has signed required CLA
@@ -173,13 +173,18 @@ function simplifyPayload(req) {
 
 //check that author of pull request is NOT a member if organisation that owns repository
 function checkisAuthorNonMember(payloadData){
-  let isNonMember
-  if(payloadData["authorAssociation"]=="MEMBER"){
-    isNonMember = false
-  } else {
-    isNonMember = true
+  try {
+    let isNonMember
+    if(payloadData["authorAssociation"]=="MEMBER"){
+      isNonMember = false
+    } else {
+      isNonMember = true
+    }
+    return isNonMember
   }
-  return isNonMember
+  catch(e){
+    throw "there was a problem checking whether author is a Member" + e
+  }
 }
 
 
