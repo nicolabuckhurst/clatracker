@@ -115,7 +115,7 @@ var DatabaseStore = {
   },
 
   //check if a user has admin status
-  checkAdminStatus: function(githubId){
+  checkAdminStatusAsync: function(githubId){
     let client=this.connectToDatabase(); //connect to database
     let key = "adminUsers"; //key of list of admin users
 

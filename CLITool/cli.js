@@ -28,7 +28,6 @@ interface.question(
                 removeSignedCLA()
                 break;
             case "5":
-                console.log("inside switch")
                 process.exit()
         }        
     }

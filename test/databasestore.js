@@ -61,19 +61,19 @@ describe("Test Database Interactions", function(){
   describe("Add a new admin user to database", function(){
 
     it("adds a github id to the list of admin uses,successfully checks if user is an admin user and then deletes admin user", function(){
-      return databaseStore.addAdminUser(testGithubId)
+      return databaseStore.addAdminUserAsync(testGithubId)
         .then(function(response){
           expect(response).to.equal(1)
-          return databaseStore.addAdminUser(testGithubId)
+          return databaseStore.addAdminUserAsync(testGithubId)
             .then(function(response){
               expect(response).to.equal(0)
-              return databaseStore.checkAdminStatus(testGithubId)
+              return databaseStore.checkAdminStatusAsync(testGithubId)
                 .then(function(response){
                   expect(response).to.equal(true)
-                  return databaseStore.deleteAdminUser(testGithubId)
+                  return databaseStore.deleteAdminUserAsync(testGithubId)
                     .then(function(response){
                       expect(response).to.equal(1)
-                      return databaseStore.checkAdminStatus(testGithubId)
+                      return databaseStore.checkAdminStatusAsync(testGithubId)
                         .then(function(response){
                           expect(response).to.equal(false)
                       })
