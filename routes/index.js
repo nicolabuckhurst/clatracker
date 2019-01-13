@@ -16,7 +16,7 @@ router.get('/', function(req, res, next) {
   //if user is logged in set admin status in session and retrieve a list of signed CLA's for homepage
   if (req.user != null){
     //check if user is admin and if they are store this information in session
-    return databaseStore.checkAdminStatus(req.user["id"])
+    return databaseStore.checkAdminStatusAsync(req.user["id"])
     .then(function(adminStatus){
       admin=adminStatus;
 
