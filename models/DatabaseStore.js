@@ -91,7 +91,7 @@ var DatabaseStore = {
   },
 
   //add githubId to list of admin Users
-  addAdminUser: function(githubId){
+  addAdminUserAsync: function(githubId){
     let client=this.connectToDatabase(); //connect to database
     let key = "adminUsers"; // key for storing list of admin users against
 
@@ -103,7 +103,7 @@ var DatabaseStore = {
   },
 
   //remove githubId from the list of admin users
-  deleteAdminUser: function(githubId){
+  deleteAdminUserAsync: function(githubId){
     let client=this.connectToDatabase(); //connect to database
     let key = "adminUsers"; //key of admin users
 
