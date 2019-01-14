@@ -55,23 +55,7 @@ var GitHubInterface = {
           //console.log(data) // Prints result from `response.json()` in getRequest
           return data.id
         })
-  },
-
-  findGithubUsername: function(githubId){
-    return fetch("https://api.github.com/users/"+githubId,
-          {
-            method:"get",
-            headers:{"Content-Type":"application/json"}
-          }
-        )
-        .then(response => response.json())
-        .then(data => {
-          //console.log(data) // Prints result from `response.json()` in getRequest
-          return data.login
-        })
   }
-
-
 }
 
 module.exports = GitHubInterface
