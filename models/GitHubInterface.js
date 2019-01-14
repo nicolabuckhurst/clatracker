@@ -55,24 +55,23 @@ var GitHubInterface = {
           //console.log(data) // Prints result from `response.json()` in getRequest
           return data.id
         })
+  },
 
-
-    //.then(response => response.body)
-    //.then(function(body){
-    /*    console.log(body)
-        if(body.status == "200"){
-          console.log(body)
-          return body.id
-        } else {
-          return "could not find github ID for this user"
-        }
-      },
-      function(error){
-        //in case of error log error and return message "status could not be set"
-        console.log(error)
-        return "could not find github ID for this user"
-      })*/
+  findGithubUsername: function(githubId){
+    return fetch("https://api.github.com/users/"+githubId,
+          {
+            method:"get",
+            headers:{"Content-Type":"application/json"}
+          }
+        )
+        .then(response => response.json())
+        .then(data => {
+          //console.log(data) // Prints result from `response.json()` in getRequest
+          return data.login
+        })
   }
+
+
 }
 
 module.exports = GitHubInterface

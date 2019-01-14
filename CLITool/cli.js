@@ -6,6 +6,7 @@ const interface = readline.createInterface({
                         })
 
 const databasestore = require('../models/DatabaseStore.js')
+const githubinterface = require('../models/GitHubInterface.js')
 
 selectOperation()
 
@@ -20,6 +21,7 @@ interface.question(
                 break;
             case "2":
                 getAdminUsers()
+                break;
             case "3":
                 addCLARequirement()
                 break;
@@ -40,32 +42,54 @@ interface.question(
 )
 }
 
+//if user is not already in database add them and then add them to list of admin users
 function setAdminStatus(){
-    interface.question("enter githubUserName true or githubusername false to set admin status on user\n",
+    interface.question("enter githubusername true or githubusername false to set admin status on user\n",
     (answer)=>{
         let inputs = answer.split(" ");
-        if(inputs[1]=="true"){
-            databasestore.addAdminUserAsync(inputs[0])
-            .then(function(){
-                selectOperation()
+        githubinterface.findGithubId(inputs[0])
+            .then(function(githubUserId){
+                databasestore.checkUserAsync(githubUserId)
+                    .then(function(userInDatabase){
+                        if(userInDatabase == false){
+                            return databasestore.storeUserDetailsAsync(githubUserId,{login:inputs[0]})
+                        } else {
+                            return "user in database"
+                        }
+                    })
+                    .then(function(){
+                        if(inputs[1]=="true"){
+                            databasestore.addAdminUserAsync(githubUserId)
+                                .then(function(){
+                                    selectOperation()
+                            })
+                        } else {
+                            databasestore.deleteAdminUserAsync(githubUserId)
+                                .then(function(){
+                                    selectOperation()
+                                 })
+                        }
+                    })
             })
-        } else {
-            databasestore.deleteAdminUserAsync(inputs[0])
-            .then(function(){
-                selectOperation()
-            })
-        }
-
-        selectOperation()
     })
 }
 
+//get the list of admin users and convert their githubid to their github username
 function getAdminUsers(){
     databasestore.getAdminUsers()
         .then(function(adminUsersArray){
-            console.log(adminUsersArray)
-            selectOperation()
-        })
+
+            let promises =[]
+            for(let i=0; i<adminUsersArray.length; i++){
+                promises.push(databasestore.retrieveUserDetailsAsync(adminUsersArray[i]))
+            }
+
+            Promise.all(promises)
+                .then(function(arrayOfUsers){
+                     console.log(arrayOfUsers)
+                     selectOperation()
+                })
+        })                
 }
 
 function addCLARequirement(){
