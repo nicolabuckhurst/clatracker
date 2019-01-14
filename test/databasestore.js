@@ -70,12 +70,16 @@ describe("Test Database Interactions", function(){
               return databaseStore.checkAdminStatusAsync(testGithubId)
                 .then(function(response){
                   expect(response).to.equal(true)
-                  return databaseStore.deleteAdminUserAsync(testGithubId)
+                  return databaseStore.getAdminUsers()
                     .then(function(response){
-                      expect(response).to.equal(1)
-                      return databaseStore.checkAdminStatusAsync(testGithubId)
+                      expect(response[0]).to.equal(testGithubId)
+                      return databaseStore.deleteAdminUserAsync(testGithubId)
                         .then(function(response){
-                          expect(response).to.equal(false)
+                          expect(response).to.equal(1)
+                          return databaseStore.checkAdminStatusAsync(testGithubId)
+                            .then(function(response){
+                              expect(response).to.equal(false)
+                          })
                       })
                   })
                 })

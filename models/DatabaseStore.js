@@ -126,6 +126,17 @@ var DatabaseStore = {
       })
   },
 
+  //get a list of admin users
+  getAdminUsers(){
+    let client = this.connectToDatabase(); //connect to datatbase
+
+    return client.smembersAsync("adminUsers")
+      .then(function(membersArray){
+        client.quit();
+        return membersArray////!! operator turns integar into boolean
+      })
+  },
+
   //save details when a CLA is signed including:
   // -- adding the CLA name to the list of CLAs stored against a user
   // -- storing the details of the signed CLA as a seperate entry in database
