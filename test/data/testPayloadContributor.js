@@ -11,7 +11,8 @@ var testPayloadContributor =
     "author_association":"CONTRIBUTOR"
   },
   "repository":{
-    "full_name":process.env.GITHUB_TEST_REPO_FULL_NAME
+    "id":process.env.GITHUB_TEST_REPO_ID,
+    "full_name":process.env.GITHUB_TEST_REPO_FULLNAME
   }
 }
 

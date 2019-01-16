@@ -43,7 +43,7 @@ var GitHubInterface = {
     )
   },
 
-  findGithubId: function(githubUsername){
+  findUserId: function(githubUsername){
     return fetch("https://api.github.com/users/"+githubUsername,
           {
             method:"get",
@@ -55,7 +55,22 @@ var GitHubInterface = {
           //console.log(data) // Prints result from `response.json()` in getRequest
           return data.id
         })
+  },
+
+  findRepoId: function(githubFullRepoName){
+    return fetch("https://api.github.com/repos/"+githubFullRepoName,
+          {
+            method:"get",
+            headers:{"Content-Type":"application/json"}
+          }
+        )
+        .then(response => response.json())
+        .then(data => {
+          return data.id
+        })
   }
+
+
 }
 
 module.exports = GitHubInterface

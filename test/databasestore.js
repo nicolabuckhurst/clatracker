@@ -123,10 +123,10 @@ describe("Test Database Interactions", function(){
   describe("Set the CLA version requirement for a repository", function(){
 
     it("adds a new key:value pair to the CLARequirements key in database", function(){
-      return databaseStore.storeCLARequirementsAsync("cla-tracker/dummydata", "version 1")
+      return databaseStore.storeCLARequirementsAsync("123456", "version 1")
         .then(function(redisResponse){
           expect(redisResponse).to.equal(1)
-          return databaseStore.retrieveCLARequirementsAsync("cla-tracker/dummydata")
+          return databaseStore.retrieveCLARequirementsAsync("123456")
         })
         .then(function(version){
           expect(version).to.equal("version 1")
@@ -137,13 +137,13 @@ describe("Test Database Interactions", function(){
   describe("return a list of CLA requirements for repositories", function(){
 
     before("add a new key:value pair to CLAReequirements key in database", function(){
-      return databaseStore.storeCLARequirementsAsync("cla-tracker/dummydata", "version 1")
+      return databaseStore.storeCLARequirementsAsync("123456", "version 1")
     })
 
     it("returns a list of CLA requirements", function(){
       return databaseStore.retrieveCLARequirementListAsync()
         .then(function(list){
-          expect(list).to.eql({"cla-tracker/dummydata":"version 1"})
+          expect(list).to.eql({"123456":"version 1"})
       })
     })
   })

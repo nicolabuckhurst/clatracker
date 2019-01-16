@@ -44,7 +44,7 @@ router.post('/', function(req,res,next){
 
 
   //return a promise to retrieve the CLARequirements from Database
-  let requiredCLAPromise = databaseStore.retrieveCLARequirementsAsync(payload["repoName"]) //declare this promise here so its resolved value is accessable further down promise chain
+  let requiredCLAPromise = databaseStore.retrieveCLARequirementsAsync(payload["repoId"]) //declare this promise here so its resolved value is accessable further down promise chain
   
   return requiredCLAPromise
   //then check to see if user has signed required CLA
@@ -57,7 +57,6 @@ router.post('/', function(req,res,next){
   })
   //then update pullrequest status based on the signed status
   .then(function(signed){
-    
     let requiredCLA = requiredCLAPromise.value() //the variable version is nolonger in scope here but as we know requiredCLAPromise has resoved here we can just take its value syncronously
       
     switch(signed){
@@ -155,7 +154,8 @@ function simplifyPayload(req) {
     payloadData["login"]=req.body["pull_request"]["user"]["login"];
     payloadData["id"] =req.body["pull_request"]["user"]["id"];
     payloadData["authorAssociation"]=req.body["pull_request"]["author_association"];
-    payloadData["repoName"] = req.body["repository"]["full_name"];
+    payloadData["repoId"] = req.body["repository"]["id"];
+    payloadData["repoName"] = req.body["repository"]["full_name"]
     payloadData["pullRequestSha"] = req.body["pull_request"]["head"]["sha"];
   
     //check all the required data fields are present

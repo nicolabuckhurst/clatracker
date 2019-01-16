@@ -3,9 +3,10 @@ var expect = require("chai").expect;
 var githubInterface = require("../models/GitHubInterface")
 var testGithubStatusParameters = require("./data/testGithubStatusParameters")
 var testPayloadContributor = require("./data/testPayloadContributor")
-var githubListener = require("../routes/githublistener")
 var testGithubUsername = "nicolabuckhurst"
 var testGithubId = 2686508
+var testGithubFullRepoName = "cla-tracker/dummydata"
+var testGithubRepoId = 139762306
 
 
 describe("it successfully sets a github status when sent a valid datapayload object and status parameters", function(){
@@ -21,7 +22,7 @@ describe("it successfully sets a github status when sent a valid datapayload obj
 describe("it successfully finds a github ID from a github username", function(){
 
   it("returns the correct githubId", function(){
-    return githubInterface.findGithubId(testGithubUsername)
+    return githubInterface.findUserId(testGithubUsername)
       .then(function(response){
         expect(response).to.equal(testGithubId)
       })

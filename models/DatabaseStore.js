@@ -204,11 +204,11 @@ var DatabaseStore = {
       })
   },
 
-  //set the CLA Version required for a repository
-  storeCLARequirementsAsync: function(repositoryFullName, CLAVersion){
+  //set the CLA Version required for a repository..store as {repId:claname}
+  storeCLARequirementsAsync: function(repositoryId, CLAVersion){
     let client=this.connectToDatabase(); //connect to database
 
-    return client.hsetAsync("CLARequirements", repositoryFullName, CLAVersion)
+    return client.hsetAsync("CLARequirements", repositoryId, CLAVersion)
       .then(function(redisResponse){
         client.quit() //close connection to database
         return redisResponse
@@ -216,10 +216,10 @@ var DatabaseStore = {
   },
 
   //check which CLA version is required for a repository
-  retrieveCLARequirementsAsync: function(repositoryFullName){
+  retrieveCLARequirementsAsync: function(repositoryId){
     let client=this.connectToDatabase(); //connect to database
 
-    return client.hgetAsync("CLARequirements", repositoryFullName)
+    return client.hgetAsync("CLARequirements", repositoryId)
       .then(function(CLAVersion){
         client.quit() //close connection to database
         return CLAVersion
