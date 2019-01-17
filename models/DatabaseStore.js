@@ -10,8 +10,9 @@ bluebird.promisifyAll(redis);
 //Data is stored in database as follows:
 //a users github profile details are stored by key user:githubId
 //a list of clas signed by a user are stored in a Set by key CLAList:githubId ..sets don't allow repeated members...so if a CLA is signed more than once it will only appear once in set
-//CLARequirements are stored against a key CLARequirements as a hash repositoryname:cla version
+//CLARequirements are stored against a key CLARequirements as a hash repositoryid:cla version
 //User details for a particular CLA  are stored against a key CLA:claversion:githubId (these could be different to github profile info)
+//A list of user Ids that are exzempt from signing a cla are stored as a set against key repoid:whitelist
 //The CLA content is stored as hash against key CLA:claversion
 //.......The page that displays the CLA expects the content to have a name, some text which can be
 //be found in the named mark down file and a list of required and optional field for the user
@@ -249,9 +250,9 @@ var DatabaseStore = {
       })
   },
 
-  //store the CLAContent in database -- CURRENTL NOT IN USE, cla details stored in a .json and .md file not in database
+  //store the location of CLAContentFiles in database //not used at the moment -- cla details stored in a .json and .md file not in database
   //takes an object as argument with key:value pairs describing content
-  storeCLAContentAsync: function(claContent){
+  storeCLAContentLocationAsync: function(filelocations){
     let client = this.connectToDatabase(); //connect to database
     let key = "CLA:"+claContent["name"]+":"; //create a key to store the CLA content against
 
@@ -259,6 +260,42 @@ var DatabaseStore = {
       .then(function(redisResponse){ //responds with OK is successfully set
         client.quit() //close connection to database
         return(redisResponse)
+      })
+  },
+
+  //add user to project whitelist..users who are excempt from signing a cla on a project
+  addUserToWhitelist(userId, repoId){
+    let client = this.connectToDatabase() //connect to database
+    let key = repoId + ":whitelist"; //key where to store set of userids that are exzempt from signing cla for a project
+
+    return client.saddAsync(key, userId)
+      .then(function(redisResponse){
+        client.quit()
+        return !!redisResponse //convert 0 and 1 to boolean
+      })
+  },
+
+  //check if user is whitelisted
+  checkIfWhitelisted(userId, repoId){
+    let client = this.connectToDatabase()
+    let key = repoId +":whitelist" //key for whitelist
+
+    return client.sismemberAsync(key, userId)
+      .then(function(response){
+        client.quit()
+        return !!response //convert 0 and 1 to boolean
+      })
+  },
+
+  //get full whitelist for a repo
+  getWhitelist(repoId){
+    let client=this.connectToDatabase()
+    let key = repoId + ":whitelist" //key for whitelist
+
+    return client.smembersAsync(key)
+      .then(function(whitelist){
+        client.quit()
+        return whitelist
       })
   },
 
