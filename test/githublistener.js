@@ -96,8 +96,44 @@ describe("/githublistener POST",function(){
         })
       })
     })
+    
+    describe("pull request opened by whitelisted non member", function(){
 
-    describe("pull request opened by non member", function(){
+      before("set spies and add dummy data to database to database", function(){
+        let promises = []
+        promises.push(databaseStore.addUserToWhitelist("123456","139762306"))
+        return Promise.all(promises)
+          .then(function(){
+            sinon.spy(databaseStore,"checkIfWhitelisted")
+            sinon.spy(databaseStore, "retrieveCLARequirementsAsync" )
+          })
+        })
+
+      after("remove spies", function(){
+        databaseStore.checkIfWhitelisted.restore()
+        databaseStore.retrieveCLARequirementsAsync.restore()
+      })
+
+      it("should call checkIfWhitelisted and not retrieve CLA requirement and respond with a 200", function(){
+        return chai.request(app).post('/githublistener')
+        .type("application/json")
+        .set('X-Hub-Signature', "")
+        .send(testpayloadContributor)
+        .then(function(res){
+          expect(res.status).to.equal(200);
+          expect(databaseStore.checkIfWhitelisted).to.have.been.called;
+          expect(databaseStore.retrieveCLARequirementsAsync).to.not.have.been.called;
+        })
+        .catch(function(err){
+            throw err;
+        })
+      })
+
+    })
+
+
+
+    describe("pull request opened by non whitelisted non member", function(){
 
       describe("if contributor has signed relevant CLA", function(){
 

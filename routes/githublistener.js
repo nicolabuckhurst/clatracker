@@ -21,7 +21,7 @@ router.post('/', function(req,res,next){
   let fail_code = 500
   let fail_message = "something went wrong setting pull request status"
   
-  //check payload haeaders, verify xhubsignature, simplify payload
+  //check payload haeaders, verify xhubsignature, simplify payload --simply asynchronous checks
   try {
     checkPayloadHeaders(req)
 
@@ -35,31 +35,39 @@ router.post('/', function(req,res,next){
       res.status(200).send("author is a member of organisation, CLA not required"); //send a 200 as this is not an error but we don't need to do anything is author is member
       return //immediately return
     }
-
   }
   catch(e) {
     res.status(500).send(e);
     throw e
   }
 
+  //required CLA is needed at various points in the long following promise chain so declare it here
+  let requiredCLA
 
-  //return a promise to retrieve the CLARequirements from Database
-  let requiredCLAPromise = databaseStore.retrieveCLARequirementsAsync(payload["repoId"]) //declare this promise here so its resolved value is accessable further down promise chain
-  
-  return requiredCLAPromise
-  //then check to see if user has signed required CLA
-  .then(function(version){
-    if(version != null){
-      return databaseStore.checkCLASignedAsync(payload["id"], version) //CLA is required check if user has signed
-    } else {
-      return "not required" //no CLA is required (this will be a promise that resolves to "not required" as its being returned from a then())
+  //check if user is whitelisted
+  return checkIsAuthorWhitelistedAsync(payload)
+  .then(function(result){
+    //user is whitelisted send a 200 and return
+    if(result == true){
+      res.status(200).send("author is not required to sign a CLA for this project"); // send a 200 not an error but no cla required
+      return 
     }
-  })
-  //then update pullrequest status based on the signed status
-  .then(function(signed){
-    let requiredCLA = requiredCLAPromise.value() //the variable version is nolonger in scope here but as we know requiredCLAPromise has resoved here we can just take its value syncronously
-      
-    switch(signed){
+    //user not whitelisted
+    //return a promise chain that does all the following async checks
+    return databaseStore.retrieveCLARequirementsAsync(payload["repoId"]) //declare this promise here so its resolved value is accessable further down promise chain
+    //what CLA version is required
+   .then(function(version){
+      if(version != null){
+        requiredCLA = version
+        //now check if user has signed
+        return databaseStore.checkCLASignedAsync(payload["id"], version) //CLA is required check if user has signed
+      } else {
+        return "not required" //no CLA is required (this will be a promise that resolves to "not required" as its being returned from a then())
+      }
+    })    
+    //then update pullrequest status based on the signed status
+    .then(function(signed){
+      switch(signed){
       //if user has signed send a success response and send 201 response
       //should be able to use req.HOSTNAME to get hostname of originating request biut there is a bug in v4 express that 
       //doesn't return port number so this doesn't work when running app on localhost:3000. So just used an env variable to store
@@ -71,7 +79,7 @@ router.post('/', function(req,res,next){
         target_url = process.env.HOSTNAME
         success_code = 201
         success_message = "User has signed relevant CLA"
-      break;
+        break;
 
       // if user needs to sign CLA
       case false:
@@ -81,7 +89,7 @@ router.post('/', function(req,res,next){
         target_url = process.env.HOSTNAME + "/CLA/" + encodeURIComponent(requiredCLA) + "/" + encodeURIComponent(payload["repoName"]) + "/" + encodeURIComponent(payload["pullRequestSha"]),
         success_code = 202
         success_message = "user has NOT signed relevant CLA"
-      break;
+        break;
 
       //if no CLA is required 
       case "not required":
@@ -91,28 +99,30 @@ router.post('/', function(req,res,next){
         target_url = process.env.HOSTNAME
         success_code = 203
         success_message = "CLA Not Required"
-      break;
+        break;
 
       default:
         console.log("something went wrong checking CLA signed status")
         res.status(500).send("unexpected output from checking whether CLA was signed")
         return ("status not set") //returns a promise that resolves to "status not set"
-    }
-      
-    return githubInterface.setPullRequestStatusAsync(payload["repoName"], payload["pullRequestSha"],
+      }
+      //set pullrequest status
+      return githubInterface.setPullRequestStatusAsync(payload["repoName"], payload["pullRequestSha"],
                                            { "state":state,
                                               "description":description,
                                               "target_url":target_url,
                                               "context":context
                                             },
                                             process.env.GITHUB_PERSONAL_ACCESS_TOKEN)
-  })
-  .then(function(response){
-    if(response == "status set"){
-      res.status(success_code).send(success_message)
-    } else {
-      res.status(fail_code).send(fail_message)
-    } 
+    })
+    .then(function(response){
+      //send a succcess or fail response
+      if(response == "status set"){
+        res.status(success_code).send(success_message)
+      } else {
+        res.status(fail_code).send(fail_message)
+      } 
+    })
   })
 })
 
@@ -184,6 +194,19 @@ function checkisAuthorNonMember(payloadData){
   }
   catch(e){
     throw "there was a problem checking whether author is a Member" + e
+  }
+}
+
+//check if author is whitelisted
+function checkIsAuthorWhitelistedAsync(payloadData){
+  try {
+    return databaseStore.checkIfWhitelisted(payloadData["id"], payloadData["repoId"])
+      .then(function(result){    
+        return result
+    })
+  }
+  catch(e){
+    throw "there was a problem checking is user is whitelisted" + e
   }
 }
 
