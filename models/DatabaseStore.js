@@ -275,6 +275,18 @@ var DatabaseStore = {
       })
   },
 
+  //remove a user from project whitelist
+  removeUserFromWhitelist(userId, repoId){
+    let client = this.connectToDatabase()
+    let key = repoId +":whitelist"; //key for whitelist
+
+    return client.sremAsync(key, userId)
+      .then(function(redisResponse){
+        client.quit()
+        return !!redisResponse //convert 0 and 1 to true false 
+      })
+  },
+
   //check if user is whitelisted
   checkIfWhitelisted(userId, repoId){
     let client = this.connectToDatabase()

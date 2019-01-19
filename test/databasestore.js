@@ -162,42 +162,47 @@ describe("Test Database Interactions", function(){
     })
   })
 
-  describe("store user in a whitelist and check they are in list", function(){
+  describe("store user in a whitelist and check they are in list then remove and check", function(){
     
     it("adds userId to whitelist", function(){
       return databaseStore.addUserToWhitelist("123456", "7891011")
         .then(function(response){
-            expect(response).to.eql(true)
-            return databaseStore.checkIfWhitelisted("123456", "7891011")
+          expect(response).to.eql(true)
+          return databaseStore.checkIfWhitelisted("123456", "7891011")
         })
         .then(function(response){
-            expect(response).to.eql(true)
+          expect(response).to.eql(true)
+          return databaseStore.removeUserFromWhitelist("123456", "7891011")
         })
-
+        .then(function(response){
+          expect(response).to.eql(true)
+          return databaseStore.checkIfWhitelisted("123456", "7891011")
+        })
+        .then(function(response){
+          expect(response).to.eql(false)
+        })
     })
-
-    describe("return whitelist for a project", function(){
-      
-      before("add some users to whitelist..add a duplicate user to check user isnt duplicated in list", function(){
-          return databaseStore.addUserToWhitelist("123456", "7891011")
-            .then(function(response){
-              return databaseStore.addUserToWhitelist("123456", "7891011")
-            })
-            .then(function(response){
-              return databaseStore.addUserToWhitelist("654321", "7891011")
-            })
-      })
-
-      it("should return a list of users whitelisted with no duplicates", function(){
-          return databaseStore.getWhitelist("7891011")
-            .then(function(whitelist){
-              expect(whitelist).to.eql(["123456", "654321"])
-            })
-      })
-
-    })
-
-
   })
 
+
+  describe("return whitelist for a project", function(){
+      
+    before("add some users to whitelist..add a duplicate user to check user isnt duplicated in list", function(){
+        return databaseStore.addUserToWhitelist("123456", "7891011")
+          .then(function(response){
+            return databaseStore.addUserToWhitelist("123456", "7891011")
+          })
+          .then(function(response){
+            return databaseStore.addUserToWhitelist("654321", "7891011")
+          })
+    })
+
+    it("should return a list of users whitelisted with no duplicates", function(){
+        return databaseStore.getWhitelist("7891011")
+          .then(function(whitelist){
+            expect(whitelist).to.eql(["123456", "654321"])
+          })
+    })
+
+  })
 })
