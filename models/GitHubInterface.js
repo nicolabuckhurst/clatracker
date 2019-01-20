@@ -52,7 +52,6 @@ var GitHubInterface = {
         )
         .then(response => response.json())
         .then(data => {
-          //console.log(data) // Prints result from `response.json()` in getRequest
           return data.id
         })
   },

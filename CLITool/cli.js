@@ -13,7 +13,7 @@ selectOperation()
     
 function selectOperation(){
 interface.question(
-    "Please select option: \n1. Add Admin User\n2. List Admin Users\n3. Configure CLA requirement for a project\n4. Get CLARequirement for project\n5. Whitelist user\n6. Remove signed cla for use\n7.Quit\n",
+    "Please select option: \n1. Add Admin User\n2. List Admin Users\n3. Configure CLA requirement for a project\n4. Get CLARequirement for project\n5. Whitelist user\n6.Remove user from whitelist\n7.Get Whitelist\n8. Remove signed CLA\n9.Quit\n",
     (option)=>{
         switch(option){
             case "1":
@@ -32,9 +32,15 @@ interface.question(
                 whitelistUser()
                 break;
             case "6":
-                removeSignedCLA()
+                removeFromWhitelist()
                 break;
             case "7":
+                getWhiteList()
+                break;
+            case "8":
+                removesignedCLA()
+                break;
+            case "9":
                 interface.close()
                 process.exit()
         }        
@@ -47,7 +53,7 @@ function setAdminStatus(){
     interface.question("enter githubusername true or githubusername false to set admin status on user\n",
     (answer)=>{
         let inputs = answer.split(" ");
-        githubinterface.findGithubId(inputs[0])
+        githubinterface.findUserId(inputs[0])
             .then(function(githubUserId){
                 databasestore.checkUserAsync(githubUserId)
                     .then(function(userInDatabase){
@@ -113,6 +119,78 @@ function getCLARequirement(){
             })
     
     })
-    
 }
+
+function whitelistUser(){
+    interface.question("please enter 'full github username' 'full github reponame'\n",
+    (answer) =>{
+        let inputs = answer.split(" ")
+        let promises = []
+        let userId, repoId
+        promises.push(githubinterface.findUserId(inputs[0]))
+        promises.push(githubinterface.findRepoId(inputs[1]))
+        return Promise.all(promises)
+            .then(function(promiseResults){
+                userId = promiseResults[0]
+                repoId = promiseResults[1]
+                return databasestore.checkUserAsync(userId)
+            })
+            .then(function(response){
+                let promises = []
+                if(response == true){
+                    return databasestore.addUserToWhitelist(userId,repoId)
+                } else {
+                    promises.push(databasestore.storeUserDetailsAsync(userId, {"id":userId, "login":inputs[0]}))
+                    promises.push(databasestore.addUserToWhitelist(userId, repoId))
+                    return Promise.all(promises)
+                }
+            })
+            .then(function(){
+                selectOperation()
+            })
+    })
+}
+
+function removeFromWhitelist(){
+    interface.question("please enter 'full github username' 'full github reponame'\n",
+    (answer) =>{
+        let inputs = answer.split(" ")
+        let promises = []
+        promises.push(githubinterface.findUserId(inputs[0]))
+        promises.push(githubinterface.findRepoId(inputs[1]))
+        return Promise.all(promises)
+            .then(function(results){
+                return databasestore.removeUserFromWhitelist(results[0],results[1])
+            })
+            .then(function(){
+                selectOperation()
+            })
+    })
+}
+
+function getWhiteList(){
+    interface.question("please enter 'full github reponame'\n",
+    (answer) =>{
+        return githubinterface.findRepoId(answer)
+        .then(function(repoId){
+            return databasestore.getWhitelist(repoId)
+        })
+        .then(function(whitelist){
+            let promises = []
+            for(i=0; i<whitelist.length; i++){
+                promises.push(databasestore.retrieveUserDetailsAsync(whitelist[i]))
+            }
+            return Promise.all(promises)
+        })
+        .then(function(whitelistUsers){
+            for(i=0;i<whitelistUsers.length;i++){
+                console.log(whitelistUsers[i].login)
+            }
+            selectOperation()
+        })
+    })
+}
+    
+    
+
 
