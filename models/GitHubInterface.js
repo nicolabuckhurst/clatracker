@@ -31,7 +31,6 @@ var GitHubInterface = {
         if(githubresponse.status == "201"){
           return "status set"
         } else {
-          console.log(githubresponse)
           return "status not set"
         }
       },
@@ -43,11 +42,12 @@ var GitHubInterface = {
     )
   },
 
-  findUserId: function(githubUsername){
+  findUserId: function(githubUsername, githubPersonalAccessToken){
     return fetch("https://api.github.com/users/"+githubUsername,
           {
             method:"get",
-            headers:{"Content-Type":"application/json"}
+            headers:{"Content-Type":"application/json",
+                      "Authorization":"token "+githubPersonalAccessToken}
           }
         )
         .then(response => response.json())
@@ -56,11 +56,12 @@ var GitHubInterface = {
         })
   },
 
-  findRepoId: function(githubFullRepoName){
+  findRepoId: function(githubFullRepoName, githubPersonalAccessToken){
     return fetch("https://api.github.com/repos/"+githubFullRepoName,
           {
             method:"get",
-            headers:{"Content-Type":"application/json"}
+            headers:{"Content-Type":"application/json",
+                      "Authorization":"token "+githubPersonalAccessToken}
           }
         )
         .then(response => response.json())

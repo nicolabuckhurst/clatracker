@@ -101,7 +101,7 @@ describe("/githublistener POST",function(){
 
       before("set spies and add dummy data to database to database", function(){
         let promises = []
-        promises.push(databaseStore.addUserToWhitelist("123456","139762306"))
+        promises.push(databaseStore.addUserToWhitelist("123456","139762263"))
         return Promise.all(promises)
           .then(function(){
             sinon.spy(databaseStore,"checkIfWhitelisted")
@@ -139,7 +139,7 @@ describe("/githublistener POST",function(){
 
         before("set spies and add dummy data to database to database", function(){
           let promises = []
-          promises.push(databaseStore.storeCLARequirementsAsync("139762306", "version 1"))
+          promises.push(databaseStore.storeCLARequirementsAsync("139762263", "version 1"))
           promises.push(databaseStore.storeUserDetailsAsync("123456",{"login":"testUser"}))
           promises.push(databaseStore.storeSignedCLADetailsAsync("123456","version 1",{"email":"testemail"}))
           return Promise.all(promises)
@@ -177,7 +177,7 @@ describe("/githublistener POST",function(){
 
         before("set spies and add dummy data to database to database", function(){
           let promises = []
-          promises.push(databaseStore.storeCLARequirementsAsync("139762306", "version 1"))
+          promises.push(databaseStore.storeCLARequirementsAsync("139762263", "version 1"))
           promises.push(databaseStore.storeUserDetailsAsync("123456",{"login":"testUser"}))
           promises.push(databaseStore.storeSignedCLADetailsAsync("123456","version 2",{"email":"testemail"}))
           return Promise.all(promises)

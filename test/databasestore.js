@@ -102,7 +102,6 @@ describe("Test Database Interactions", function(){
           return databaseStore.retrieveUserCLAVersions(testGithubId);
         })
         .then(function(ArrayOfCLAVersions){
-          console.log(ArrayOfCLAVersions);
           expect(ArrayOfCLAVersions).to.have.members([testCLA1, testCLA2]);
           return databaseStore.checkCLASignedAsync(testGithubId, testCLA2)
         })

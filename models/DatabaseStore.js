@@ -310,8 +310,6 @@ var DatabaseStore = {
     let client = this.connectToDatabase()
     let key = repoId +":whitelist" //key for whitelist
 
-    console.log(key)
-
     return client.sismemberAsync(key, userId)
       .then(function(response){
         client.quit()

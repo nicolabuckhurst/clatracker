@@ -16,31 +16,31 @@ interface.question(
     (option)=>{
         switch(option){
             case "1":
-                adminfunctions.setAdminStatus()
+                setAdminStatus()
                 break;
             case "2":
-                adminfunctions.getAdminUsers()
+                getAdminUsers()
                 break;
             case "3":
-                adminfunctions.addCLARequirement()
+                addCLARequirement()
                 break;
             case "4":
-                adminfunctions.getCLARequirement()
+                getCLARequirement()
                 break
             case "5":
-                adminfunctions.whitelistUser()
+                whitelistUser()
                 break;
             case "6":
-                adminfunctions.removeFromWhitelist()
+                removeFromWhitelist()
                 break;
             case "7":
-                adminfunctions.getWhiteList()
+                getWhitelist()
                 break;
             case "8":
-                adminfunctions.removesignedCLA()
+                removesignedCLA()
                 break;
             case "9":
-                adminfunctions.getListofCLAs()
+                getListofCLAs()
                 break;
             case "10":
                 interface.close()
@@ -50,3 +50,106 @@ interface.question(
 )
 }
 
+function setAdminStatus(){
+    interface.question("enter githubusername true or githubusername false to set admin status on user\n",
+    (answer)=>{
+        let inputs = answer.split(" ")
+
+        return adminfunctions.setAdminStatusAsync(inputs[0], JSON.parse(inputs[1]))
+            .then(function(){
+                selectOperation()
+            })
+    })
+}
+
+function getAdminUsers(){
+    adminfunctions.getAdminUserNamesAsync()
+        .then(function(arrayOfAdminUsernames){
+            for(i=0; i<arrayOfAdminUsernames.length;i++){
+                console.log(arrayOfAdminUsernames[i]+" ")
+            }
+            selectOperation()
+        })
+}
+
+function addCLARequirement(){
+    interface.question("enter 'full name of github project' 'name of cla' if a cla is already specificied for this project it will be overwritten\n",
+    (answer)=>{
+        let inputs = answer.split(" ");
+        databasestore.storeCLARequirementsAsync(inputs[0], inputs[1])
+            .then(function(){
+                selectOperation();
+            })
+    })
+}
+
+function getCLARequirement(){
+    interface.question("please enter the full name of the github project\n",
+    (answer)=>{
+        databasestore.retrieveCLARequirementsAsync(answer)
+            .then(function(response){
+                console.log(response)
+                selectOperation()
+            })
+    
+    })
+}
+
+function whitelistUser(){
+    interface.question("please enter 'full github username' 'full github reponame'\n",
+    (answer) =>{
+        let inputs = answer.split(" ")
+         return adminfunctions.whitelistUserAsync(inputs[0], inputs[1])   
+         .then(function(response){
+            selectOperation()
+         })
+    })
+}
+
+function removeFromWhitelist(){
+    interface.question("please enter 'full github username' 'full github reponame'\n",
+    (answer) =>{
+        let inputs = answer.split(" ")
+        return adminfunctions.removeFromWhiteListAsync(inputs[0], inputs[1])
+        .then(function(){
+            selectOperation()
+        })
+    })
+}
+
+function getWhitelist(){
+    interface.question("please enter 'full github reponame'\n",
+    (answer) =>{
+        return adminfunctions.getWhitelistAsync(answer)
+        .then(function(whitelistUsernames){
+            for(i=0;i<whitelistUsernames.length;i++){
+                console.log(whitelistUsernames[i]+" ")
+            }
+            selectOperation()
+        })
+    })
+}
+
+function removesignedCLA(){
+    interface.question("please enter 'full github username' 'claname'\n",
+    (answer) =>{
+        let inputs = answer.split(" ")
+        return adminfunctions.removesignedCLAAsync(inputs[0],inputs[1])
+        .then(function(){
+            selectOperation()
+        })
+    })
+}
+
+function getListofCLAs(){
+    interface.question("please enter 'full github username'\n",
+    (answer) =>{
+        return adminfunctions.getListofCLAsAsync(answer)
+        .then(function(listOfCLAs){
+            for(i=0;i<listOfCLAs.length;i++){
+                console.log(listOfCLAs[i])
+            }
+            selectOperation()
+        })
+    })
+}
