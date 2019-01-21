@@ -116,6 +116,22 @@ describe("Test Database Interactions", function(){
         })
         .then(function(CLADetails){
           expect(CLADetails).to.eql(testCLADetails);
+          return databaseStore.deleteSignedCLADetailsAsync(testGithubId, testCLA1)
+        })
+        .then(function(response){
+          expect(response).to.eql([1,1])
+          return databaseStore.retrieveUserCLAVersions(testGithubId)
+        })
+        .then(function(ArrayOfCLAVersions){
+          expect(ArrayOfCLAVersions).to.have.members([testCLA2]);
+          return databaseStore.checkCLASignedAsync(testGithubId, testCLA2)
+        })
+        .then(function(signed){
+          expect(signed).to.eql(true)
+          return databaseStore.checkCLASignedAsync(testGithubId, testCLA1)
+        })
+        .then(function(signed){
+          expect(signed).to.eql(false)
         })
     })
   })
@@ -165,6 +181,7 @@ describe("Test Database Interactions", function(){
   describe("store user in a whitelist and check they are in list then remove and check", function(){
     
     it("adds userId to whitelist", function(){
+
       return databaseStore.addUserToWhitelist("123456", "7891011")
         .then(function(response){
           expect(response).to.eql(true)

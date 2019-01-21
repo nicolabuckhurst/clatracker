@@ -175,6 +175,24 @@ var DatabaseStore = {
       })
   },
 
+  deleteSignedCLADetailsAsync: function(githubId, CLAVersion){
+    let client = this.connectToDatabase()
+
+    let CLAListKey = "CLAList:"+githubId;
+    
+    let claVersionNoSpaces = CLAVersion.replace(" ","")
+    let CLADetailsKey = "CLA:"+claVersionNoSpaces+":"+githubId
+
+    let promises =[]
+    promises.push(client.sremAsync(CLAListKey, CLAVersion))
+    promises.push(client.delAsync(CLADetailsKey))
+    return Promise.all(promises)
+      .then(function(responses){
+        client.quit();
+        return(responses)
+      })
+  },
+
   //retrieve list of users CLA versions
   retrieveUserCLAVersions: function(githubId){
       let client=this.connectToDatabase(); //connect to database
