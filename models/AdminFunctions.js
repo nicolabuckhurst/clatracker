@@ -5,9 +5,10 @@ const githubinterface = require('./GitHubInterface')
 var AdminFunctions = {
 //if user is not already in database add them and then add them to list of admin users
 setAdminStatusAsync: function(githubUsername, flag){
+    let userId
     return githubinterface.findUserId(githubUsername, process.env.GITHUB_PERSONAL_ACCESS_TOKEN)
         .then(function(githubUserId){
-            let userId = githubUserId
+            userId = githubUserId
             return databasestore.checkUserAsync(githubUserId)
                 .then(function(userInDatabase){
                     if(userInDatabase == false){
@@ -18,9 +19,9 @@ setAdminStatusAsync: function(githubUsername, flag){
                 })
                 .then(function(){
                     if(flag==true){
-                        return databasestore.addAdminUserAsync(githubUserId)
+                        return databasestore.addAdminUserAsync(userId)
                     } else {
-                        return databasestore.deleteAdminUserAsync(githubUserId)
+                        return databasestore.deleteAdminUserAsync(userId)
                     }
                 })
         })
@@ -47,13 +48,14 @@ getAdminUserNamesAsync: function(){
 },
 
 whitelistUserAsync: function(githubUsername, repoName){
+    let userId, repoId
     let promises = []
     promises.push(githubinterface.findUserId(githubUsername, process.env.GITHUB_PERSONAL_ACCESS_TOKEN))
     promises.push(githubinterface.findRepoId(repoName, process.env.GITHUB_PERSONAL_ACCESS_TOKEN))
     return Promise.all(promises)
     .then(function(promiseResults){
-        let userId = promiseResults[0]
-        let repoId = promiseResults[1]
+        userId = promiseResults[0]
+        repoId = promiseResults[1]
         return databasestore.checkUserAsync(userId)
             .then(function(response){
                 let promises = []

@@ -6,6 +6,10 @@ const interface = readline.createInterface({
                         })
 
 const adminfunctions = require('../models/AdminFunctions')
+const databasestore = require('../models/DatabaseStore')
+
+
+/****THERE ARE NO AUTOMATED TESTS FOR THIS FILE -- TESTED MANUALLY */
 
 selectOperation()
 
@@ -45,6 +49,9 @@ interface.question(
             case "10":
                 interface.close()
                 process.exit()
+            default:
+                console.log("invalid option")
+                selectOperation()
         }        
     }
 )
@@ -54,7 +61,6 @@ function setAdminStatus(){
     interface.question("enter githubusername true or githubusername false to set admin status on user\n",
     (answer)=>{
         let inputs = answer.split(" ")
-
         return adminfunctions.setAdminStatusAsync(inputs[0], JSON.parse(inputs[1]))
             .then(function(){
                 selectOperation()
@@ -110,7 +116,7 @@ function removeFromWhitelist(){
     interface.question("please enter 'full github username' 'full github reponame'\n",
     (answer) =>{
         let inputs = answer.split(" ")
-        return adminfunctions.removeFromWhiteListAsync(inputs[0], inputs[1])
+        return adminfunctions.removeFromWhitelistAsync(inputs[0], inputs[1])
         .then(function(){
             selectOperation()
         })
@@ -120,7 +126,7 @@ function removeFromWhitelist(){
 function getWhitelist(){
     interface.question("please enter 'full github reponame'\n",
     (answer) =>{
-        return adminfunctions.getWhitelistAsync(answer)
+        return adminfunctions.getWhiteListAsync(answer)
         .then(function(whitelistUsernames){
             for(i=0;i<whitelistUsernames.length;i++){
                 console.log(whitelistUsernames[i]+" ")
