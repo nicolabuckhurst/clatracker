@@ -52,6 +52,9 @@ var GitHubInterface = {
         )
         .then(response => response.json())
         .then(data => {
+          if (data.id == undefined){
+            throw new Error ("Github user does not exist")
+          }
           return data.id
         })
   },
@@ -66,6 +69,9 @@ var GitHubInterface = {
         )
         .then(response => response.json())
         .then(data => {
+          if(data.id == undefined){
+            throw new Error ("Github repo does not exist")
+          }
           return data.id
         })
   }

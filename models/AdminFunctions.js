@@ -47,6 +47,20 @@ getAdminUserNamesAsync: function(){
     })                
 },
 
+addCLARequirementAsync: function(repoName, claVersion){
+    return githubinterface.findRepoId(repoName, process.env.GITHUB_PERSONAL_ACCESS_TOKEN)
+    .then(function(repoId){
+        return databasestore.storeCLARequirementsAsync(repoId, claVersion)
+    })
+},
+
+retrieveCLARequirementAsync: function(repoName){
+    return githubinterface.findRepoId(repoName, process.env.GITHUB_PERSONAL_ACCESS_TOKEN)
+    .then(function(repoId){
+        return databasestore.retrieveCLARequirementsAsync(repoId)
+    })    
+},
+
 whitelistUserAsync: function(githubUsername, repoName){
     let userId, repoId
     let promises = []
