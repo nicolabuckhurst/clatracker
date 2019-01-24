@@ -190,11 +190,13 @@ function getWhitelist(){
 }
 
 function removesignedCLA(){
+    console.log(chalk.red("Be careful with this function it will not update pull request status for pull requests already submitted"))
     interface.question(chalk.blue("please enter 'full github username' 'claname'\n"),
     (answer) =>{
         let inputs = answer.split(" ")
-        return adminfunctions.removesignedCLAAsync(inputs[0],inputs[1])
+        return adminfunctions.removeSignedCLAAsync(inputs[0],inputs[1])
         .then(function(){
+            console.log(chalk.green("success"))
             selectOperation()
         })
         .catch(function(e){

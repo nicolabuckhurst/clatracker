@@ -6,7 +6,9 @@
     "start": "node ./bin/www",
     "startlocal": ". ../clatrackerCONFIG/config_base.txt && . ../clatrackerCONFIG/config_dev.txt && nodemon ./bin/www",
     "test": ". ../clatrackerCONFIG/config_base.txt && . ../clatrackerCONFIG/config_test.txt && mocha test --exit",
-    "cli": ". ../clatrackerCONFIG/config_base.txt && . ../clatrackerCONFIG/config_dev.txt && node ./CLITool/cli"
+    "clilocal": ". ../clatrackerCONFIG/config_base.txt && . ../clatrackerCONFIG/config_dev.txt && node ./CLITool/cli",
+    "cli":"node ./CLITool/cli"
+    
   },
   "dependencies": {
     "bluebird": "^3.5.1",
