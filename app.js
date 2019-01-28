@@ -26,6 +26,7 @@ var githublistener = require('./routes/githublistener');
 var status = require('./routes/status');
 var cla = require('./routes/CLA');
 var login = require('./routes/login');
+var admin = require('./routes/admin');
 
 var app = express();
 
@@ -174,6 +175,7 @@ app.use('/githublistener', githublistener);
 app.use('/status', status);
 app.use('/CLA', cla);
 app.use('/login', login);
+app.use('/admin', admin);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

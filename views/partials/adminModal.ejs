@@ -1,0 +1,102 @@
+<div class="modal fade" id="adminModal" tabindex="-1" role="dialog" aria-labelledby="adminModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="adminModalLabel">Administrator Access</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+                <ul id="adminList" class="list-group list-group-flush mb-5">
+            
+                </ul>
+                <form>
+                    <div class="form-group">
+                        <label for="newAdminUser">Give a User Admin Rights:</label>
+                        <input type="text" class="form-control" id="newAdminUser" aria-describedby="newAdminUser" placeholder="Enter Github Username">
+                            <small id="newAdminHelp" class="form-text text-muted">please enter a valid Github login name</small>
+                    </div>
+                    <button type="button" id="formSubmit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $(document).ready(function(){
+
+        //when modal is shown get the list of admin users from clatracker app and the append them as list items into the model body
+        $('#adminModal').on('shown.bs.modal', function (e) {
+            fetch('https://localhost:3000/admin/listofAdminUsers')
+            .then(response => response.json())
+            .then(function(data){
+                
+                for(i=0;i<data.adminUsers.length;i++){
+                    $("#adminList").append(
+                        '<li class="list-group-item d-flex justify-content-between align-items-center" data-listitem-name="'+data.adminUsers[i]+'">'+data.adminUsers[i]+
+                        '<button type="button" class="delete btn btn-danger" data-name="'+data.adminUsers[i]+'">'+'Delete'+'</button></li>'
+                    )
+                }
+            
+                $(".delete").click((e)=>deleteAdminUserHandler(e))
+                $("#formSubmit").click((e)=>addAdminUserHandler(e))
+
+            })
+        })
+
+        $("#adminModal").on('hidden.bs.modal', function(e){
+            $("#adminList").empty()
+         })
+    })
+
+
+    function deleteAdminUserHandler(e){
+        //get the data-name attribute of the clicked button and then ask clatracker to delete them....if successful remove them from list in modal
+        let userName = e.target.getAttribute('data-name')
+        fetch('https://localhost:3000/admin/deleteAdminUser',
+        {
+            method: 'POST',
+            headers:{
+                "Content-Type":"application/json"
+            }, 
+            body: JSON.stringify({userName: userName})
+        })
+        .then(function(response){
+            console.log(response.status)
+            if(response.status == 200){
+                $('[data-listitem-name="'+userName+'"]').remove()
+            }
+        })  
+    }
+
+    function addAdminUserHandler(e){
+        let userName = $("#newAdminUser").val()
+        fetch('https://localhost:3000/admin/addNewAdmin',
+        {
+            method: 'POST',
+            headers:{
+                "Content-Type":"application/json"
+            }, 
+            body: JSON.stringify({userName: userName})
+        })
+        .then(function(response){
+            console.log(response)
+            if(response.status == 200){
+                $("#adminList").append(
+                        '<li class="list-group-item d-flex justify-content-between align-items-center" data-listitem-name="'+userName+'">'+userName+
+                        '<button type="button" class="delete btn btn-danger" data-name="'+userName+'">'+'Delete'+'</button></li>'
+                    )
+                $(".delete").click((e)=>deleteAdminUserHandler(e))
+                $("#newAdminUser").val($("newAdminUser").attr("placeholder"))
+            }
+        })
+    }
+
+
+</script>

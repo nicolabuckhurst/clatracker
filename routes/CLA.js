@@ -35,27 +35,32 @@ router.get("/:claName/:repoName/:pullRequestSha", function(req, res, next){
   let userId = req.user["id"];
   let profilePicture = req.user["githubPicture"];
   let alertMessage;
+  let admin;
 
   //check if user has already signed the CLA --- it is possible that the user has
   //signed this CLA since pull request was made generating a link to this page....
   //so check for signing again here
-  return databaseStore.checkCLASignedAsync(userId,claName)
-    .then(function(signed){
-      //if user has signed return and update pull request status, alert user with message
-      if(signed== true){
-        return updatePullRequestStatusToSignedAsync(repoName, pullRequestSha, claName)
-        .then(function(response){
-          if(response == "status set"){
-            alertMessage = "You have already signed the relevant CLA since submitting your pull request, the pull request status on Github has now been updated"
-          }else{
-            alertMessage = "You have already signed the relevant CLA since submitting your pull request, however there was a problem updating the pull request status on Github. Please resubmit your pull request"
-          }
-          renderAlert(res, profilePicture, alertMessage);
-        })
-      }
-
-      //if user hasn't signed go ahead and render a cla form to fill in
-      return renderClaForm(res, profilePicture, repoName,pullRequestSha,claName);
+  return databaseStore.checkAdminStatusAsync(userId)
+  .then(function(adminStatus){
+    admin = adminStatus
+    return databaseStore.checkCLASignedAsync(userId,claName)
+  })
+  .then(function(signed){
+    //if user has signed return and update pull request status, alert user with message
+    if(signed== true){
+      return updatePullRequestStatusToSignedAsync(repoName, pullRequestSha, claName)
+      .then(function(response){
+        if(response == "status set"){
+          alertMessage = "You have already signed the relevant CLA since submitting your pull request, the pull request status on Github has now been updated"
+        }else{
+          alertMessage = "You have already signed the relevant CLA since submitting your pull request, however there was a problem updating the pull request status on Github. Please resubmit your pull request"
+        }
+        renderAlert(res, profilePicture, alertMessage);
+      })
+    }
+  
+    //if user hasn't signed go ahead and render a cla form to fill in
+    return renderClaForm(res, profilePicture, repoName,pullRequestSha,claName, admin);
     })
 })
 
@@ -101,7 +106,7 @@ function renderAlert(res, profilePicture, message){
   res.render('alert',{"title":"Alert", "loggedIn":true, "profilePicture":profilePicture, message:message})
 }
 
-function renderClaForm(res,profilePicture, repoName, pullRequestSha, claName){
+function renderClaForm(res,profilePicture, repoName, pullRequestSha, claName, admin){
   //when we post the CLA form back to server we want to keep track of
   //claName and the repoName and pull requestsha from this route Parameters
   //so we can trigger an update to the pullrequest status on github once the
@@ -125,7 +130,7 @@ function renderClaForm(res,profilePicture, repoName, pullRequestSha, claName){
       let claContentsParsed=claContents
       claContentsParsed["text"] = converter.makeHtml(textData)
           
-      res.render('CLA', {"title":"Sign CLA", "loggedIn":true, "profilePicture":profilePicture, "claContents":claContentsParsed, "postURL":postURL})
+      res.render('CLA', {"title":"Sign CLA", "loggedIn":true, "profilePicture":profilePicture, "claContents":claContentsParsed, "postURL":postURL, "admin":admin})
     })
   })
 }

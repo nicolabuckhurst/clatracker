@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html>
 
   <head>
@@ -21,6 +20,7 @@
     <!--link to fontawesome so we can include logos-->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.1/css/all.css" integrity="sha384-O8whS3fhG2OnA5Kas0Y9l3cfpmYjapjI0E4theH4iuMD+pLhbf6JI0jIMfYcK3yZ" crossorigin="anonymous">
 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   </head>
 
   <body>
@@ -40,15 +40,15 @@
       <!--just leaving space for the footer-->
 
         <div class="content flex-grow-1">
+        
+            <%if(admin == true){%>
+                <!--array of objects for details of links in navbar-->
+                <%var links = [{url:"/", label:"Home", active:false},
+                                      {url:"/admin", label:"Admin", active:true}]%>
+            <%}else{%>
+                <%var links = [{url:"/", label:"Home", active:false}]%>
+            <%}%>
 
-          <%if(admin == true){%>
-            <!--array of objects for details of links in navbar-->
-            <%var links = [{url:"/", label:"Home", active:true},
-                              {url:"/admin", label:"Admin", active:false}]%>
-          <%}else{%>
-              <%var links = [{url:"/", label:"Home", active:true}]%>
-          <%}%>
-          
           <!--include navbar defined in navbar partial-->
           <% include partials/navbar %>
 
@@ -56,19 +56,25 @@
             <div class="row">
               <div class="col-12 ">
                 <div class="h1 text-center mb-4">
-                  Contributor Licence Agreement Tracker
+                  Administrator Page
                 </div>
               </div>
             </div>
 
             <div class="row justify-content-center">
               <div class="col-8">
-                <ul class="list-group">
-                  <% for(item in claList){ %>
-                    <li class="list-group-item ">
-                      <a href="#"><%=claList[item]%></a></li>
-                  <%}%>
-                </ul>
+                <% if(admin==false){ %>
+                    <p class="text-danger text-center">You need admin rights to access this page...please return to homepage</p>
+                <% } else { %>
+                <div class="list-group">
+                    <button type="button" class="list-group-item list-group-item-action" data-toggle="modal" data-target="#adminModal">Manage Administrators</button>
+                    <button type="button" class="list-group-item list-group-item-action" data-toggle="modal" data-target="#whitelistModal"">Manage Whitelists (users exempt from a CLA)</button>
+                    <button type="button" class="list-group-item list-group-item-action" data-toggle="modal" data-target="#claModal"">Configure CLA Requirements</button>
+                </div>
+
+                <% include partials/adminModal %>
+
+                <% } %>
               </div>
             </div>
 
