@@ -46,7 +46,7 @@
             
                 $(".delete").click((e)=>deleteAdminUserHandler(e))
                 $("#formSubmit").click((e)=>addAdminUserHandler(e))
-                $("#newAdminUser").keypress((e)=>{e.preventDefault();if(e.keyCode == 13){addAdminUserHandler(e)}})
+                $("#newAdminUser").keypress((e)=>{if(e.keyCode == 13){e.preventDefault();addAdminUserHandler(e)}})
 
             })
         })
@@ -95,6 +95,8 @@
                     )
                 $(".delete").click((e)=>deleteAdminUserHandler(e))
                 $("#newAdminUser").val($("newAdminUser").attr("placeholder"))
+                $("#newAdminUser").focus((e)=>$("newAdminUser").val(""))
+
             }
         })
     }

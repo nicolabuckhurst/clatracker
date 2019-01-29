@@ -4,7 +4,7 @@ var router = express.Router();
 
 // modules for accessing database and calling github API
 var databaseStore = require("../models/DatabaseStore")
-var gitHubInterface = require("../models/GitHubInterface")
+var githubinterface = require("../models/GitHubInterface")
 
 const adminFunctions = require("../models/AdminFunctions")
 
@@ -64,7 +64,6 @@ router.post("/deleteAdminUser", function(req,res,next){
 })
 
 router.post("/addNewAdmin", function(req, res, next){
-    console.log("called")
     return databaseStore.checkAdminStatusAsync(req.user["id"])
     .then(function(adminStatus){
         if(adminStatus == true){
@@ -74,7 +73,6 @@ router.post("/addNewAdmin", function(req, res, next){
         }
     })
     .then(function(response){
-        console.log(response)
         if(response == "1"){
             res.status(200).send()
         } else {
@@ -82,9 +80,46 @@ router.post("/addNewAdmin", function(req, res, next){
         }
     })
     .catch(function(e){
-        console.log("throwing error" + e)
         res.status(500).send(e)
     })
+})
+
+router.post("/whitelistUser", function(req, res, next){
+    let repo = req.body["repoName"]
+    let userName = req.body["userName"]
+    return adminFunctions.whitelistUserAsync(userName,repo)   
+         .then(function(response){
+            res.status(200).send()
+         })
+         .catch(function(e){
+            res.status(500).send(e)
+        })
+})
+
+router.post("/whitelist", function(req,res,next){
+    let repo = req.body["repoName"]
+    return adminFunctions.getWhiteListAsync(repo)
+    .then(function(whitelistUsernames){
+        console.log(whitelistUsernames)
+        res.send({'users':whitelistUsernames})
+    })
+    .catch(function(e){
+        res.status(500).send(e)
+    })
+})
+
+router.post("/deleteWhitelistedUser", function(req, res,next){
+    let repo = req.body["repoName"]
+    let userName = req.body["userName"]
+    console.log(repo)
+    console.log(userName)
+    return adminFunctions.removeFromWhitelistAsync(userName, repo)
+        .then(function(){
+            res.status(200).send()
+        })
+        .catch(function(e){
+           res.status(500).send(e)
+        })
 })
 
 module.exports = router

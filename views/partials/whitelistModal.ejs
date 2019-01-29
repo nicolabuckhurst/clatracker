@@ -1,0 +1,153 @@
+<div class="modal fade" id="whitelistModal" tabindex="-1" role="dialog" aria-labelledby="adminModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="whitelistModalLabel">Whitelist Users</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+                <div class="h5">Add a new user to whitelist</div>
+                <form id="whitelistForm">
+                    <div class="form-group">
+                        <label for="projectName">Github Repo Name</label>
+                        <input type="" class="form-control" id="projectName" aria-describedby="projectName" placeholder="Enter Github Repo Name">
+                            <small id="projectNameHelp" class="form-text text-muted">please enter the full repo name owner/reponame</small>
+                    </div>
+                    <div class="form-group">
+                            <label for="userName">Github Username</label>
+                            <input type="" class="form-control" id="userName" aria-describedby="userName" placeholder="Enter Github Username">
+                                <small id="userNameHelp" class="form-text text-muted">please enter a github username</small>
+                        </div>
+                    <button type="button" id="whitelistformSubmit" class="btn btn-primary">Submit</button>
+                </form>
+                <div id="alert">
+
+                </div>
+
+                <div class="h5">Show whitelisted users</div>
+                <form id="showwhitelistForm">
+                    <div class="form-group">
+                        <label for="projectName2">Github Repo Name</label>
+                        <input type="" class="form-control" id="projectName2" aria-describedby="projectName" placeholder="Enter Github Repo Name">
+                        <small id="projectName2Help" class="form-text text-muted">please enter the full repo name owner/reponame</small>
+                    </div>
+                    <button type="button" id="showWhitelistSubmit" class="btn btn-primary">Show</button>
+                </form>
+
+                <div class="h6" id="whitelistTitle">
+            
+                </div>
+                <ul id="whitelist" class="list-group list-group-flush mb-5">
+            
+                 </ul>
+
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $(document).ready(function(){
+
+        //when modal is shown get the list of admin users from clatracker app and the append them as list items into the model body
+        $('#whitelistModal').on('shown.bs.modal', function (e) {
+            $("#whitelistformSubmit").click((e)=>whitelistUserHandler(e))
+            $("#projectName").focus((e)=>{$('#alert').empty()})
+            $("#userName").focus((e)=>{$('#alert').empty()})
+            $("#showWhitelistSubmit").click((e)=>whitelistHandler(e))
+        })
+
+        $("#whitelistModal").on('hidden.bs.modal', function(e){
+            $("#whitelistTitle").empty()
+            $("#whitelist").empty()
+        })
+
+    })
+
+    function whitelistUserHandler(e) {
+        let repo = $('#projectName').val()
+        let userName = $('#userName').val()
+        fetch('https://localhost:3000/admin/whitelistUser',
+        {
+            method: 'POST',
+            headers:{
+                "Content-Type":"application/json"
+            }, 
+            body: JSON.stringify({'repoName': repo, 'userName':userName}) 
+        })
+        .then(function(response){
+            if(response.status == 200){
+                $('#alert').append(
+                    '<p class="text-success">success</p>'
+                )
+            } else {
+                $('#alert').append(
+                    '<p class="text-danger">There was a problem whitelisting user</p>'
+                )
+            }
+            $('#projectName').val($('#projectName').attr('placeholder'))
+            $('#userName').val( $('#userName').attr('placeholder'))
+            $('#projectName').focus((e)=>$('#projectName').val(''))
+            $('#userName').focus((e)=>$('#userName').val(''))
+        })
+    }
+
+    function whitelistHandler(e){
+        let repo = $('#projectName2').val()
+        $('#whitelistTitle').empty()
+        fetch('https://localhost:3000/admin/whitelist',
+        {
+            method: 'POST',
+            headers:{
+                "Content-Type":"application/json"
+            }, 
+            body: JSON.stringify({'repoName': repo}) 
+        })
+        .then(response => response.json())
+        .then(function(data){
+            if(data.users != undefined){
+                $("#whitelistTitle").append(repo)
+                
+                for(i=0;i<data.users.length;i++){
+                    $("#whitelist").append(
+                        '<li class="list-group-item d-flex justify-content-between align-items-center" data-whitelistitem-name="'+data.users[i]+'">'+data.users[i]+
+                        '<button type="button" class="deletewhitelisteduser btn btn-danger" data-whitelistproject="'+repo+'" data-whitelistname="'+data.users[i]+'">'+'Delete'+'</button></li>'
+                 )
+                }
+                $(".deletewhitelisteduser").click((e)=>deleteWhitelistUserHandler(e))
+            }
+            
+            $('#projectName2').val($('#projectName2').attr('placeholder'))
+            $('#projectName2').focus((e)=>$('#projectName2').val(''))
+        })
+    }
+    
+    function deleteWhitelistUserHandler(e){
+        //get the data-name attribute of the clicked button and then ask clatracker to delete them....if successful remove them from list in modal
+        let userName = e.target.getAttribute('data-whitelistname')
+        let projectName = e.target.getAttribute('data-whitelistproject')
+        console.log(userName)
+        console.log(projectName)
+        fetch('https://localhost:3000/admin/deleteWhitelistedUser',
+        {
+            method: 'POST',
+            headers:{
+                "Content-Type":"application/json"
+            }, 
+            body: JSON.stringify({'userName': userName, 'repoName':projectName})
+        })
+        .then(function(response){
+            console.log(response.status)
+            if(response.status == 200){
+                $('[data-whitelistitem-name="'+userName+'"]').remove()
+            }
+        })  
+    }
+
+</script>
