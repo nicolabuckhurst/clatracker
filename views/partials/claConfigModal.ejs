@@ -49,25 +49,26 @@
 
 <script>
     $(document).ready(function(){
+        $('#claConfigSubmit').click((e)=>claConfigSumbitHandler(e))
+        $('#claConfigViewSubmit').click((e)=>showClaConfigHandler(e))
+        $('#claConfigProject').focus((e)=>$('#claConfigAlert').empty())
+        $('#claConfigName').focus((e)=>$('#claConfigAlert').empty())
 
         //when modal is shown get the list of admin users from clatracker app and the append them as list items into the model body
         $('#claConfigModal').on('shown.bs.modal', function (e) {
-            $('#claConfigSubmit').click((e)=>claConfigSumbitHandler(e))
-            $('#claConfigProject').focus((e)=>$('#claConfigAlert').empty())
-            $('#claConfigName').focus((e)=>$('#claConfigAlert').empty())
 
-            $('#claConfigViewSubmit').click((e)=>showClaConfigHandler(e))
-            $('#claViewProject').focus((e)=>$('#claViewProject').val(''))
-            $('#claViewProject').focus((e)=>$('#claNameTitle').empty())
-            $('#claViewProject').focus((e)=>$('#claName').empty())
         })
 
         $("#claConfigModal").on('hidden.bs.modal', function(e){
-          
+            $('#claNameTitle').empty()
+            $('#claName').empty()
+            $('#claConfigAlert').empty()
          })
+
     })
 
     function claConfigSumbitHandler(e){
+        $('#claConfigAlert').empty()
         let repoName = $('#claConfigProject').val()
         let claName = $('#claConfigCLAName').val()
         fetch(hostname+'/admin/setCLARequirements',
@@ -84,14 +85,18 @@
             } else {
                 $('#claConfigAlert').append('<p class="text-danger">Something went wrong setting CLA Requirement</p>')
             }
-            $('#claConfigProject').val($('#claConfigProject').attr('placeholder'))
-            $('#claConfigCLAName').val($('#claConfigName').attr('placeholder'))
+            $('#claConfigProject').val('')
+            $('#claConfigCLAName').val('')
         })
         
     }
 
     function showClaConfigHandler(e){
+        $('#claNameTitle').empty()
+        $('#claName').empty()
         let repoName = $('#claViewProject').val()
+        console.log(repoName)
+        console.log($('#claViewProject').val())
         fetch(hostname+'/admin/getCLARequirement',
         {
             method: 'POST',
@@ -102,9 +107,9 @@
         })
         .then(response => response.json())
         .then(function(data){
-            console.log(data)
             $('#claNameTitle').append(repoName)
             $('#claName').append(data.claName)
+            $('#claViewProject').val('')
         })
     }
     

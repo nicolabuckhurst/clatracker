@@ -53,23 +53,26 @@
 
 <script>
     $(document).ready(function(){
+        $("#whitelistformSubmit").click((e)=>whitelistUserHandler(e))
+        $("#showWhitelistSubmit").click((e)=>whitelistHandler(e))
+        $("#projectName").focus((e)=>{$('#alert').empty()})
+        $("#userName").focus((e)=>{$('#alert').empty()})
 
         //when modal is shown get the list of admin users from clatracker app and the append them as list items into the model body
         $('#whitelistModal').on('shown.bs.modal', function (e) {
-            $("#whitelistformSubmit").click((e)=>whitelistUserHandler(e))
-            $("#projectName").focus((e)=>{$('#alert').empty()})
-            $("#userName").focus((e)=>{$('#alert').empty()})
-            $("#showWhitelistSubmit").click((e)=>whitelistHandler(e))
+           
         })
 
         $("#whitelistModal").on('hidden.bs.modal', function(e){
             $("#whitelistTitle").empty()
             $("#whitelist").empty()
+            $('#alert').empty()
         })
 
     })
 
     function whitelistUserHandler(e) {
+        $('#alert').empty()
         let repo = $('#projectName').val()
         let userName = $('#userName').val()
         fetch(hostname+'/admin/whitelistUser',
@@ -90,16 +93,15 @@
                     '<p class="text-danger">There was a problem whitelisting user</p>'
                 )
             }
-            $('#projectName').val($('#projectName').attr('placeholder'))
-            $('#userName').val( $('#userName').attr('placeholder'))
-            $('#projectName').focus((e)=>$('#projectName').val(''))
-            $('#userName').focus((e)=>$('#userName').val(''))
+            $('#projectName').val('')
+            $('#userName').val('')
         })
     }
 
     function whitelistHandler(e){
-        let repo = $('#projectName2').val()
         $('#whitelistTitle').empty()
+        $('#whitelist').empty()
+        let repo = $('#projectName2').val()
         fetch(hostname+'/admin/whitelist',
         {
             method: 'POST',
@@ -122,8 +124,7 @@
                 $(".deletewhitelisteduser").click((e)=>deleteWhitelistUserHandler(e))
             }
             
-            $('#projectName2').val($('#projectName2').attr('placeholder'))
-            $('#projectName2').focus((e)=>$('#projectName2').val(''))
+            $('#projectName2').val('')
         })
     }
     

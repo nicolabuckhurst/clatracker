@@ -134,6 +134,7 @@ router.post("/getCLARequirement", function(req, res, next){
     let repo = req.body["repoName"]
     return adminFunctions.retrieveCLARequirementAsync(repo)
     .then(function(claName){
+        console.log(claName)
         res.send({'claName':claName})
     })
     .catch(function(e){
