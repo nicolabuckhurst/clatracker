@@ -48,7 +48,6 @@
 </div>
 
 <script>
-
     $(document).ready(function(){
 
         //when modal is shown get the list of admin users from clatracker app and the append them as list items into the model body
@@ -71,7 +70,7 @@
     function claConfigSumbitHandler(e){
         let repoName = $('#claConfigProject').val()
         let claName = $('#claConfigCLAName').val()
-        fetch('https://localhost:3000/admin/setCLARequirements',
+        fetch(hostname+'/admin/setCLARequirements',
         {
             method: 'POST',
             headers:{
@@ -93,7 +92,7 @@
 
     function showClaConfigHandler(e){
         let repoName = $('#claViewProject').val()
-        fetch('https://localhost:3000/admin/getCLARequirement',
+        fetch(hostname+'/admin/getCLARequirement',
         {
             method: 'POST',
             headers:{

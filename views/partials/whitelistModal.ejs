@@ -52,7 +52,6 @@
 </div>
 
 <script>
-
     $(document).ready(function(){
 
         //when modal is shown get the list of admin users from clatracker app and the append them as list items into the model body
@@ -73,7 +72,7 @@
     function whitelistUserHandler(e) {
         let repo = $('#projectName').val()
         let userName = $('#userName').val()
-        fetch('https://localhost:3000/admin/whitelistUser',
+        fetch(hostname+'/admin/whitelistUser',
         {
             method: 'POST',
             headers:{
@@ -101,7 +100,7 @@
     function whitelistHandler(e){
         let repo = $('#projectName2').val()
         $('#whitelistTitle').empty()
-        fetch('https://localhost:3000/admin/whitelist',
+        fetch(hostname+'/admin/whitelist',
         {
             method: 'POST',
             headers:{
@@ -132,7 +131,7 @@
         //get the data-name attribute of the clicked button and then ask clatracker to delete them....if successful remove them from list in modal
         let userName = e.target.getAttribute('data-whitelistname')
         let projectName = e.target.getAttribute('data-whitelistproject')
-        fetch('https://localhost:3000/admin/deleteWhitelistedUser',
+        fetch(hostname+'/admin/deleteWhitelistedUser',
         {
             method: 'POST',
             headers:{

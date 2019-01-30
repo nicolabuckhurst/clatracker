@@ -15,7 +15,6 @@ router.get("/", function(req, res, next){
         return
     }
 
-
     //check if user is admin and if they are store this information in session
     return databaseStore.checkAdminStatusAsync(req.user["id"])
     .then(function(adminStatus){

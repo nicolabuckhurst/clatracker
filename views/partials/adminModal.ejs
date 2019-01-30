@@ -28,12 +28,12 @@
 </div>
 
 <script>
-
+    let hostname = window.location.origin
     $(document).ready(function(){
 
         //when modal is shown get the list of admin users from clatracker app and the append them as list items into the model body
         $('#adminModal').on('shown.bs.modal', function (e) {
-            fetch('https://localhost:3000/admin/listofAdminUsers')
+            fetch(hostname+'/admin/listofAdminUsers')
             .then(response => response.json())
             .then(function(data){
                 console.log(data.adminUsers)
@@ -63,7 +63,7 @@
     function deleteAdminUserHandler(e){
         //get the data-name attribute of the clicked button and then ask clatracker to delete them....if successful remove them from list in modal
         let userName = e.target.getAttribute('data-name')
-        fetch('https://localhost:3000/admin/deleteAdminUser',
+        fetch(hostname+'/admin/deleteAdminUser',
         {
             method: 'POST',
             headers:{
@@ -81,7 +81,7 @@
 
     function addAdminUserHandler(e){
         let userName = $("#newAdminUser").val()
-        fetch('https://localhost:3000/admin/addNewAdmin',
+        fetch(hostname+'/admin/addNewAdmin',
         {
             method: 'POST',
             headers:{
