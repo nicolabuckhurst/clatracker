@@ -1,0 +1,113 @@
+<div class="modal fade" id="claConfigModal" tabindex="-1" role="dialog" aria-labelledby="claConfigModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="claConfigModalLabel">CLA Configuration</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+                <div class="h6">Set CLA requirement for Project:</div>
+                <form>
+                    <div class="form-group">
+                        <label for="claConfigProject">Repo Name:</label>
+                        <input type="text" class="form-control" id="claConfigProject" aria-describedby="claConfigProject" placeholder="Enter Github Repo Name">
+                            <small id="claConfigProjectHelp" class="form-text text-muted">please enter full Github Repo Name owner/reponame</small>
+                        <label for="claConfigCLAName">CLA Name:</label>
+                        <input type="text" class="form-control" id="claConfigCLAName" aria-describedby="claConfigCLAName" placeholder="Enter CLA Name">
+                            <small id="claConfigUsername" class="form-text text-muted">please enter CLA name or leave blank to set no requirement</small>
+                    </div>
+                    <button type="button" id="claConfigSubmit" class="btn btn-primary">Submit</button>
+                </form>
+                <div id="claConfigAlert">
+
+                </div>
+
+                <div class="h6">View CLA config:</div>
+                <form>
+                    <div class="form-group">
+                        <label for="claViewProject">Repo Name:</label>
+                        <input type="text" class="form-control" id="claViewProject" aria-describedby="claViewProject" placeholder="Enter Github Repo Name">
+                            <small id="claViewProjectHelp" class="form-text text-muted">please enter full Github Repo Name owner/reponame</small>
+                    </div>
+                </form>
+                <button type="button" id="claConfigViewSubmit" class="btn btn-primary">Show</button>
+                <div class="h6" id="claNameTitle">
+
+                </div>
+                <div id ="claName">
+                    
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $(document).ready(function(){
+
+        //when modal is shown get the list of admin users from clatracker app and the append them as list items into the model body
+        $('#claConfigModal').on('shown.bs.modal', function (e) {
+            $('#claConfigSubmit').click((e)=>claConfigSumbitHandler(e))
+            $('#claConfigProject').focus((e)=>$('#claConfigAlert').empty())
+            $('#claConfigName').focus((e)=>$('#claConfigAlert').empty())
+
+            $('#claConfigViewSubmit').click((e)=>showClaConfigHandler(e))
+            $('#claViewProject').focus((e)=>$('#claViewProject').val(''))
+            $('#claViewProject').focus((e)=>$('#claNameTitle').empty())
+            $('#claViewProject').focus((e)=>$('#claName').empty())
+        })
+
+        $("#claConfigModal").on('hidden.bs.modal', function(e){
+          
+         })
+    })
+
+    function claConfigSumbitHandler(e){
+        let repoName = $('#claConfigProject').val()
+        let claName = $('#claConfigCLAName').val()
+        fetch('https://localhost:3000/admin/setCLARequirements',
+        {
+            method: 'POST',
+            headers:{
+                "Content-Type":"application/json"
+            }, 
+            body: JSON.stringify({'repoName': repoName, 'claName':claName}) 
+        })
+        .then(function(response){
+            if(response.status == 200){
+                $('#claConfigAlert').append('<p class="text-success">Success</p>')
+            } else {
+                $('#claConfigAlert').append('<p class="text-danger">Something went wrong setting CLA Requirement</p>')
+            }
+            $('#claConfigProject').val($('#claConfigProject').attr('placeholder'))
+            $('#claConfigCLAName').val($('#claConfigName').attr('placeholder'))
+        })
+        
+    }
+
+    function showClaConfigHandler(e){
+        let repoName = $('#claViewProject').val()
+        fetch('https://localhost:3000/admin/getCLARequirement',
+        {
+            method: 'POST',
+            headers:{
+                "Content-Type":"application/json"
+            }, 
+            body: JSON.stringify({'repoName': repoName}) 
+        })
+        .then(response => response.json())
+        .then(function(data){
+            console.log(data)
+            $('#claNameTitle').append(repoName)
+            $('#claName').append(data.claName)
+        })
+    }
+    
+
+</script>

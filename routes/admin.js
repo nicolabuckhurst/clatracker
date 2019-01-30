@@ -100,7 +100,6 @@ router.post("/whitelist", function(req,res,next){
     let repo = req.body["repoName"]
     return adminFunctions.getWhiteListAsync(repo)
     .then(function(whitelistUsernames){
-        console.log(whitelistUsernames)
         res.send({'users':whitelistUsernames})
     })
     .catch(function(e){
@@ -111,8 +110,6 @@ router.post("/whitelist", function(req,res,next){
 router.post("/deleteWhitelistedUser", function(req, res,next){
     let repo = req.body["repoName"]
     let userName = req.body["userName"]
-    console.log(repo)
-    console.log(userName)
     return adminFunctions.removeFromWhitelistAsync(userName, repo)
         .then(function(){
             res.status(200).send()
@@ -120,6 +117,29 @@ router.post("/deleteWhitelistedUser", function(req, res,next){
         .catch(function(e){
            res.status(500).send(e)
         })
+})
+
+router.post("/setCLARequirements", function(req, res, next){
+    let repo = req.body["repoName"]
+    let cla = req.body["claName"]
+    return adminFunctions.addCLARequirementAsync(repo, cla)
+    .then(function(){
+        res.status(200).send()
+    })
+    .catch(function(e){
+        res.status(500).send(e)
+    })
+})
+
+router.post("/getCLARequirement", function(req, res, next){
+    let repo = req.body["repoName"]
+    return adminFunctions.retrieveCLARequirementAsync(repo)
+    .then(function(claName){
+        res.send({'claName':claName})
+    })
+    .catch(function(e){
+        res.status(500).send(e)
+    })
 })
 
 module.exports = router

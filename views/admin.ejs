@@ -69,11 +69,12 @@
                 <div class="list-group">
                     <button type="button" class="list-group-item list-group-item-action" data-toggle="modal" data-target="#adminModal">Manage Administrators</button>
                     <button type="button" class="list-group-item list-group-item-action" data-toggle="modal" data-target="#whitelistModal"">Manage Whitelists (users exempt from a CLA)</button>
-                    <button type="button" class="list-group-item list-group-item-action" data-toggle="modal" data-target="#claModal"">Configure CLA Requirements</button>
+                    <button type="button" class="list-group-item list-group-item-action" data-toggle="modal" data-target="#claConfigModal"">Configure CLA Requirements</button>
                 </div>
 
                 <% include partials/adminModal %>
                 <% include partials/whitelistModal %>
+                <% include partials/claConfigModal %>
 
                 <% } %>
               </div>

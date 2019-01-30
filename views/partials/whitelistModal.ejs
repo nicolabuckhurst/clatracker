@@ -8,7 +8,7 @@
               </button>
             </div>
             <div class="modal-body">
-                <div class="h5">Add a new user to whitelist</div>
+                <div class="h6">Add a new user to whitelist</div>
                 <form id="whitelistForm">
                     <div class="form-group">
                         <label for="projectName">Github Repo Name</label>
@@ -26,7 +26,7 @@
 
                 </div>
 
-                <div class="h5">Show whitelisted users</div>
+                <div class="h6">Show whitelisted users</div>
                 <form id="showwhitelistForm">
                     <div class="form-group">
                         <label for="projectName2">Github Repo Name</label>
@@ -132,8 +132,6 @@
         //get the data-name attribute of the clicked button and then ask clatracker to delete them....if successful remove them from list in modal
         let userName = e.target.getAttribute('data-whitelistname')
         let projectName = e.target.getAttribute('data-whitelistproject')
-        console.log(userName)
-        console.log(projectName)
         fetch('https://localhost:3000/admin/deleteWhitelistedUser',
         {
             method: 'POST',
@@ -143,7 +141,6 @@
             body: JSON.stringify({'userName': userName, 'repoName':projectName})
         })
         .then(function(response){
-            console.log(response.status)
             if(response.status == 200){
                 $('[data-whitelistitem-name="'+userName+'"]').remove()
             }

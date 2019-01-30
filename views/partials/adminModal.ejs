@@ -36,14 +36,16 @@
             fetch('https://localhost:3000/admin/listofAdminUsers')
             .then(response => response.json())
             .then(function(data){
-                
+                console.log(data.adminUsers)
                 for(i=0;i<data.adminUsers.length;i++){
+                    console.log(i)
                     $("#adminList").append(
                         '<li class="list-group-item d-flex justify-content-between align-items-center" data-listitem-name="'+data.adminUsers[i]+'">'+data.adminUsers[i]+
                         '<button type="button" class="delete btn btn-danger" data-name="'+data.adminUsers[i]+'">'+'Delete'+'</button></li>'
                     )
                 }
-            
+                
+
                 $(".delete").click((e)=>deleteAdminUserHandler(e))
                 $("#formSubmit").click((e)=>addAdminUserHandler(e))
                 $("#newAdminUser").keypress((e)=>{if(e.keyCode == 13){e.preventDefault();addAdminUserHandler(e)}})
@@ -53,7 +55,8 @@
 
         $("#adminModal").on('hidden.bs.modal', function(e){
             $("#adminList").empty()
-         })
+        })
+    
     })
 
 

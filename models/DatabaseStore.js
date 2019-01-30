@@ -226,12 +226,20 @@ var DatabaseStore = {
   //set the CLA Version required for a repository..store as {repId:claname}
   storeCLARequirementsAsync: function(repositoryId, CLAVersion){
     let client=this.connectToDatabase(); //connect to database
-
-    return client.hsetAsync("CLARequirements", repositoryId, CLAVersion)
-      .then(function(redisResponse){
-        client.quit() //close connection to database
-        return redisResponse
-      })
+    let promise
+    console.log(CLAVersion)
+    if(CLAVersion == undefined || CLAVersion == ""){
+      promise = client.hdelAsync("CLARequirements", repositoryId)
+    } else{
+      console.log("set")
+      promise = client.hsetAsync("CLARequirements", repositoryId, CLAVersion)
+    }
+    return promise
+    .then(function(redisResponse){
+      console.log(redisResponse)
+      client.quit() //close connection to database
+      return redisResponse
+    })
   },
 
   //check which CLA version is required for a repository
