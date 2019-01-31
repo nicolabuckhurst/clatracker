@@ -41,7 +41,7 @@ This will create a folder called **clatrackerapp** containing the app
 -these files must be located in a folder called **claCONFIG** which is in the same location as the **clatracker** folder created by git clone. So you will now have 2 folders:
 
 ../../clatrackerapp\
-../../claCONFIG\
+../../claCONFIG
 
 Now create 2 files within **claCONFIG**
 #### config_base.txt
@@ -53,7 +53,7 @@ export CLIENT_ID=\
 export CLIENT_SECRET=\
 export SESSION_SECRET=\
 export GITHUB_RETURN=\
-export HOSTNAME=\
+export HOSTNAME=
 
 WEBHOOK_SECRET_TOKEN: 
 This should be set to a high entropy random string....when you set up a project in Github that you would like to hook up to the clatrackerapp you will use this to secure the payload coming from Github to the clatracker app
@@ -67,15 +67,15 @@ GITHUB_PERSONAL_ACCESS_TOKEN:
     - `Token description`: add any description
     - `Select scopes`: select all options under `repo`
  
- SSL_KEY:
+ SSL_KEY:\
  SSL_CERT:
  - [Create a self signed  SSL Key and Cert for development](https://devcenter.heroku.com/articles/ssl-certificate-self)
  - Expose this key and cert by setting environment variables
    - SSL_KEY = file_path/key.pem
    - SSL_CERT = file_path/cert.pem
    
-  CLIENT_ID:
-  CLIENT_SECRET:
+  CLIENT_ID:\
+  CLIENT_SECRET:\
   GITHUB_RETURN:
   - Create a Github OAUTH App, this is used when user logs into clatracker app in order to get the github profile of that user
   - Select `Settings` from dropdown at top-right of screen
@@ -86,7 +86,7 @@ GITHUB_PERSONAL_ACCESS_TOKEN:
     - `Application Description`: Give your app a description eg.application to manage CLA requirements on opensource projects
     - `Authorisation callback URL`:https://localhost:3000/login/github/return
   - Select `Register Application`
-  - Expose your OAUTH app to clatracker app using environment variables
+  - set
     - CLIENT_ID = OAUTH_CLIENT_ID
     - CLIENT_SECRET = OAUTH_CLIENT_SECRET
     - GITHUB_RETURN = https://localhost:3000/login/github/return
@@ -98,18 +98,19 @@ HOSTNAME:
 https://localhost:3000
 
 ##### config_dev
-export REDIS_URL=
+export REDIS_URL=\
 export CLA_FILES_PATH=
 
 REDIS_URL:
 redis://localhost:6379
 
 CLA_FILES_PATH:
-- the files for the available CLAs are stored in a folder called CLAFiles
 CLAFiles
 
 ### Run clatrackerapp:
-```npm start_local```
+```
+npm start_local
+```
 -this will launch the app on https://localhost:3000
 
 ## Tests:
@@ -118,15 +119,15 @@ CLAFiles
 In order to run the test suite on this app you need a third config file
 
 #### config_test
-export REDIS_URL=
-export GITHUB_PULL_REQ_SHA=
-export GITHUB_TEST_REPO_ID=
-export GITHUB_TEST_REPO_FULLNAME=
-export VERIFICATION_TEST_XHUBSIGNATURE=
-export RUN_GITHUBINTERFACE_TESTS=
-export RUN_VERIFYSIGNATURE_TESTS=
-export CLA_FILES_PATH=
-export NODE_ENV=
+export REDIS_URL=\
+export GITHUB_PULL_REQ_SHA=\
+export GITHUB_TEST_REPO_ID=\
+export GITHUB_TEST_REPO_FULLNAME=\
+export VERIFICATION_TEST_XHUBSIGNATURE=\
+export RUN_GITHUBINTERFACE_TESTS=\
+export RUN_VERIFYSIGNATURE_TESTS=\
+export CLA_FILES_PATH=\
+export NODE_ENV=\
 
 REDIS_URL:
 redis://localhost:6379
@@ -136,8 +137,8 @@ GITHUB_TEST_REPO_FULL_NAME:
   - Expose the full name of your test repository as\
  owner\reponame
  
- GITHUB_PULL_REQ_SHA:
- GITHUB_TEST_REPO_ID:
+ GITHUB_PULL_REQ_SHA:\
+ GITHUB_TEST_REPO_ID:\
  GITHUB_TEST_REPO_FULLNAME:
  - Set up a webhook from test repository to clatracker to send a payload when a pull-request is created
   - Go intothe test repositories settings and select `Webhooks` and then `add webhook` and setup your webhook as follows:
@@ -154,7 +155,7 @@ GITHUB_TEST_REPO_FULL_NAME:
   -find ["pull_request"]["repo"]["id"] in the delivered payload
   - set this as GITHUB_TEST_REPO_ID
   
-RUN_GITHUBINTERFACE_TESTS:
+RUN_GITHUBINTERFACE_TESTS:\
 RUN_VERIFYSIGNATURE_TESTS:
 - set these to 1 to run full test suite
 - set these to 0 to skip tests that read/write from github and just use a built in test payload
