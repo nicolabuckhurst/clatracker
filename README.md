@@ -40,20 +40,20 @@ This will create a folder called **clatrackerapp** containing the app
 
 -these files must be located in a folder called **claCONFIG** which is in the same location as the **clatracker** folder created by git clone. So you will now have 2 folders:
 
-../../clatrackerapp
-../../claCONFIG
+../../clatrackerapp\
+../../claCONFIG\
 
 Now create 2 files within **claCONFIG**
 #### config_base.txt
-export WEBHOOK_SECRET_TOKEN=
-export GITHUB_PERSONAL_ACCESS_TOKEN=
-export SSL_KEY=
-export SSL_CERT=
-export CLIENT_ID=
-export CLIENT_SECRET=
-export SESSION_SECRET=
-export GITHUB_RETURN=
-export HOSTNAME=
+export WEBHOOK_SECRET_TOKEN=\
+export GITHUB_PERSONAL_ACCESS_TOKEN=\
+export SSL_KEY=\
+export SSL_CERT=\
+export CLIENT_ID=\
+export CLIENT_SECRET=\
+export SESSION_SECRET=\
+export GITHUB_RETURN=\
+export HOSTNAME=\
 
 WEBHOOK_SECRET_TOKEN: 
 This should be set to a high entropy random string....when you set up a project in Github that you would like to hook up to the clatrackerapp you will use this to secure the payload coming from Github to the clatracker app
