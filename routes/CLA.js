@@ -19,11 +19,11 @@ var path = require('path')
 // displays the CLA form to be filled in
 // the URL contains 3 parameters claName, repoName, pullRequestSha
 // repoName and pullRequestSha are needed so we can update the relevant pull request status on githubs
-router.get("/:claName/:repoName/:pullRequestSha", function(req, res, next){ 
+router.get("/:claName/:repoName/:pullRequestSha", function (req, res) {
   req.session.rdUrl = req.originalUrl;
 
   //if user is not logged in reroute to login and return immediately
-  if(req.user==null){
+  if (req.user == null) {
     res.redirect('/login/github');
     return
   }
@@ -41,32 +41,32 @@ router.get("/:claName/:repoName/:pullRequestSha", function(req, res, next){
   //signed this CLA since pull request was made generating a link to this page....
   //so check for signing again here
   return databaseStore.checkAdminStatusAsync(userId)
-  .then(function(adminStatus){
-    admin = adminStatus
-    return databaseStore.checkCLASignedAsync(userId,claName)
-  })
-  .then(function(signed){
-    //if user has signed return and update pull request status, alert user with message
-    if(signed== true){
-      return updatePullRequestStatusToSignedAsync(repoName, pullRequestSha, claName)
-      .then(function(response){
-        if(response == "status set"){
-          alertMessage = "You have already signed the relevant CLA since submitting your pull request, the pull request status on Github has now been updated"
-        }else{
-          alertMessage = "You have already signed the relevant CLA since submitting your pull request, however there was a problem updating the pull request status on Github. Please resubmit your pull request"
-        }
-        renderAlert(res, profilePicture, alertMessage);
-      })
-    }
-  
-    //if user hasn't signed go ahead and render a cla form to fill in
-    return renderClaForm(res, profilePicture, repoName,pullRequestSha,claName, admin);
+    .then(function (adminStatus) {
+      admin = adminStatus
+      return databaseStore.checkCLASignedAsync(userId, claName)
+    })
+    .then(function (signed) {
+      //if user has signed return and update pull request status, alert user with message
+      if (signed == true) {
+        return updatePullRequestStatusToSignedAsync(repoName, pullRequestSha, claName)
+          .then(function (response) {
+            if (response == "status set") {
+              alertMessage = "You have already signed the relevant CLA since submitting your pull request, the pull request status on Github has now been updated"
+            } else {
+              alertMessage = "You have already signed the relevant CLA since submitting your pull request, however there was a problem updating the pull request status on Github. Please resubmit your pull request"
+            }
+            renderAlert(res, profilePicture, alertMessage);
+          })
+      }
+
+      //if user hasn't signed go ahead and render a cla form to fill in
+      return renderClaForm(res, profilePicture, repoName, pullRequestSha, claName, admin);
     })
 })
 
 //********* POST ROUTE ******************/
 //route to post data from form to...pass the claname, reponame and pullRequestSha as url Parameters
-router.post("/:claName/:repoName/:pullRequestSha", function(req, res, next){
+router.post("/:claName/:repoName/:pullRequestSha", function (req, res) {
   let userId = req.user.id;
   let profilePicture = req.user.githubPicture;
   let repoName = req.params.repoName
@@ -76,63 +76,64 @@ router.post("/:claName/:repoName/:pullRequestSha", function(req, res, next){
   let alertMessage;
 
   return databaseStore.storeSignedCLADetailsAsync(userId, claName, formData)
-    .then(function(responses){
+    .then(function () {
       return updatePullRequestStatusToSignedAsync(repoName, pullRequestSha, claName)
-    })         
-    .then(function(response){
-      if(response == "status set"){
+    })
+    .then(function (response) {
+      if (response == "status set") {
         //redirect to homepage
         res.redirect("/")
-      }else{
+      } else {
         alertMessage = "you have signed the CLA but there was a problem updating the pullRequestStatus on github. Please resubmit your pull request"
-        renderAlert(res, profilePicture,alertMessage);
+        renderAlert(res, profilePicture, alertMessage);
       }
     })
 })
 
 //**************HELPER FUNCTIONS*********************/
 
-function updatePullRequestStatusToSignedAsync(repoName, pullRequestSha, claName){
+function updatePullRequestStatusToSignedAsync(repoName, pullRequestSha, claName) {
   return gitHubInterface.setPullRequestStatusAsync(repoName, pullRequestSha,
-    { "state":"success",
-      "description":"User has signed the relevant CLA version ( "+ claName +" )",
-      "target_url":"https://localhost:3000",
-      "context":"CLATracker"
+    {
+      "state": "success",
+      "description": "User has signed the relevant CLA version ( " + claName + " )",
+      "target_url": "https://localhost:3000",
+      "context": "CLATracker"
     },
     process.env.GITHUB_PERSONAL_ACCESS_TOKEN)
 }
 
-function renderAlert(res, profilePicture, message){
-  res.render('alert',{"title":"Alert", "loggedIn":true, "profilePicture":profilePicture, message:message})
+function renderAlert(res, profilePicture, message) {
+  res.render('alert', { "title": "Alert", "loggedIn": true, "profilePicture": profilePicture, message: message })
 }
 
-function renderClaForm(res,profilePicture, repoName, pullRequestSha, claName, admin){
+function renderClaForm(res, profilePicture, repoName, pullRequestSha, claName, admin) {
   //when we post the CLA form back to server we want to keep track of
   //claName and the repoName and pull requestsha from this route Parameters
   //so we can trigger an update to the pullrequest status on github once the
   //cla is signed...so create a link that parses these parameters in url
   //encoding any special characters
   let postURL = "/CLA/" + encodeURIComponent(claName) + "/" + encodeURIComponent(repoName) + "/" + encodeURIComponent(pullRequestSha)
-      
+
   //if in test mode pick up the test CLA files otherwise pick up the development version of files...locations set in local config files
-  let claFilesPath = path.join(__dirname,'../'+process.env.CLA_FILES_PATH);
-  let claContentsPath = claFilesPath+'/'+claName.replace(/\s/g,'')+'.json' //remove all whitespace from claName 
-      
+  let claFilesPath = path.join(__dirname, '../' + process.env.CLA_FILES_PATH);
+  let claContentsPath = claFilesPath + '/' + claName.replace(/\s/g, '') + '.json' //remove all whitespace from claName 
+
   //Read the claContents .json file into an object asynchronously...fs doesn't use promises it uses callbacks
-  fs.readFile(claContentsPath,'utf8', function(err, claContentsData){
+  fs.readFile(claContentsPath, 'utf8', function (err, claContentsData) {
     let claContents = JSON.parse(claContentsData)
 
     //then read the text content of the CLA asynchronously as a utf8 encoded string and then pass
     //data into callbackURL so that the markdown text gets parsed to html
     //replace the ["text"] property in the CLAContents json with the actual html content of CLA
-    let claTextPath = claFilesPath+'/'+claContents["text"]
-    fs.readFile(claTextPath,'utf8',function(err, textData){
-      let claContentsParsed=claContents
+    let claTextPath = claFilesPath + '/' + claContents["text"]
+    fs.readFile(claTextPath, 'utf8', function (err, textData) {
+      let claContentsParsed = claContents
       claContentsParsed["text"] = converter.makeHtml(textData)
-          
-      res.render('CLA', {"title":"Sign CLA", "loggedIn":true, "profilePicture":profilePicture, "claContents":claContentsParsed, "postURL":postURL, "admin":admin})
+
+      res.render('CLA', { "title": "Sign CLA", "loggedIn": true, "profilePicture": profilePicture, "claContents": claContentsParsed, "postURL": postURL, "admin": admin })
     })
   })
 }
 
-module.exports=router
+module.exports = router
