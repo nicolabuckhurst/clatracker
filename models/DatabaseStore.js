@@ -155,7 +155,7 @@ var DatabaseStore = {
 
     return Promise.all(promises)
       .then(function(redisResponses){ //the redis response for saddAsync is the number of members stored (member isn't stored if it already exists)
-                                       //for the hmsetAsync response should be "OK"
+        //for the hmsetAsync response should be "OK"
         client.quit() //close connection to data
         return redisResponses; //will be [1, "OK"] if successful
       })
@@ -195,15 +195,15 @@ var DatabaseStore = {
 
   //retrieve list of users CLA versions
   retrieveUserCLAVersions: function(githubId){
-      let client=this.connectToDatabase(); //connect to database
+    let client=this.connectToDatabase(); //connect to database
 
-      let key = "CLAList:"+githubId; //key to access set of CLAs signed by user
+    let key = "CLAList:"+githubId; //key to access set of CLAs signed by user
 
-      return client.smembersAsync(key) //returns an array of CLA Versions.....cannot guarantee order returned in
-        .then(function(CLAList){
-          client.quit() //close connection to database
-          return(CLAList)
-        })
+    return client.smembersAsync(key) //returns an array of CLA Versions.....cannot guarantee order returned in
+      .then(function(CLAList){
+        client.quit() //close connection to database
+        return(CLAList)
+      })
   },
 
   //check if a CLA has been signed by user
@@ -235,11 +235,11 @@ var DatabaseStore = {
       promise = client.hsetAsync("CLARequirements", repositoryId, CLAVersion)
     }
     return promise
-    .then(function(redisResponse){
-      console.log(redisResponse)
-      client.quit() //close connection to database
-      return redisResponse
-    })
+      .then(function(redisResponse){
+        console.log(redisResponse)
+        client.quit() //close connection to database
+        return redisResponse
+      })
   },
 
   //check which CLA version is required for a repository
@@ -278,16 +278,16 @@ var DatabaseStore = {
 
   //store the location of CLAContentFiles in database //not used at the moment -- cla details stored in a .json and .md file not in database
   //takes an object as argument with key:value pairs describing content
-  storeCLAContentLocationAsync: function(filelocations){
-    let client = this.connectToDatabase(); //connect to database
-    let key = "CLA:"+claContent["name"]+":"; //create a key to store the CLA content against
+  // storeCLAContentLocationAsync: function(filelocations){
+  //   let client = this.connectToDatabase(); //connect to database
+  //   let key = "CLA:"+claContent["name"]+":"; //create a key to store the CLA content against
 
-    return client.hmsetAsync(key, claContent)
-      .then(function(redisResponse){ //responds with OK is successfully set
-        client.quit() //close connection to database
-        return(redisResponse)
-      })
-  },
+  //   return client.hmsetAsync(key, claContent)
+  //     .then(function(redisResponse){ //responds with OK is successfully set
+  //       client.quit() //close connection to database
+  //       return(redisResponse)
+  //     })
+  // },
 
   //add user to project whitelist..users who are excempt from signing a cla on a project
   addUserToWhitelist(userId, repoId){
