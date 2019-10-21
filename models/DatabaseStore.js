@@ -43,15 +43,13 @@ var DatabaseStore = {
 
   //takes object containing user details as field:value pairs eg {"username":"testuser"}
   //stores these details against key "user:githubId" in a Hash datastructure in Redis database
-  storeUserDetailsAsync: function(githubId, details){
+  storeUserDetailsAsync: async function(githubId, details){
     let client=this.connectToDatabase(); //create a client to interact with database
     let key = "user:"+githubId;          //create key for user details
 
-    return client.hmsetAsync(key,details) //return a promise to store user details in Redis
-      .then(function(redisresponse){
-        client.quit()                     //close connection to database
-        return redisresponse             //finally return the response from Redis database..this should be string "OK"
-      })
+    const redisresponse = await client.hmsetAsync(key,details); //wait for storing user details in Redis to resolve
+    client.quit()                     //close connection to database
+    return redisresponse             //finally return the response from Redis database..this should be string "OK"
   },
 
   //takes githubId as argument
